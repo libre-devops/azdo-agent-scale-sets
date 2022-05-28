@@ -129,7 +129,8 @@
         {"name": "terraform-docs"},
         {"name": "kubeval"},
         {"name": "kubeaudit"},
-        {"name": "colordiff"}
+        {"name": "colordiff"},
+        {"name": "tfenv"}
     ],
     "docker": {
         "images": [
