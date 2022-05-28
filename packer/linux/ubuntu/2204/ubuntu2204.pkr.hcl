@@ -64,12 +64,12 @@ variable "location" {
 
 variable "subscription_id" {
   type    = string
-  default = "${env("ARM_SUBSCRIPTION_ID")}"
+  description = "The gallery resource group name, passed as a PKR_VAR"
 }
 
 variable "tenant_id" {
   type    = string
-  default = "${env("ARM_TENANT_ID")}"
+  description = "The gallery resource group name, passed as a PKR_VAR"
 }
 
 variable "gallery_name" {
