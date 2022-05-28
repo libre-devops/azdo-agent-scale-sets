@@ -30,4 +30,5 @@ jobs:
           packer-client-secret: ${{ secrets.SpokeSvpClientSecret }}
           packer-subscription-id: ${{ secrets.SpokeSubId }}
           packer-tenant-id: ${{ secrets.SpokeTenantId }}
+          packer-version: "latest"
 
