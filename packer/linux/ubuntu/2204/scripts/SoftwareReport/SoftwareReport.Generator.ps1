@@ -8,8 +8,6 @@ $global:ErrorView = "NormalView"
 Set-StrictMode -Version Latest
 
 Import-Module MarkdownPS
-Import-Module (Join-Path $PSScriptRoot "SoftwareReport.Android.psm1") -DisableNameChecking
-Import-Module (Join-Path $PSScriptRoot "SoftwareReport.Browsers.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "SoftwareReport.CachedTools.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "SoftwareReport.Common.psm1") -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot "SoftwareReport.Databases.psm1") -DisableNameChecking
@@ -39,29 +37,9 @@ $markdown += New-MDHeader "Language and Runtime" -Level 3
 
 $runtimesList = @(
     (Get-BashVersion),
-    (Get-CPPVersions),
-    (Get-FortranVersions),
-    (Get-NodeVersion),
-    (Get-PerlVersion),
     (Get-PythonVersion),
-    (Get-Python3Version),
-    (Get-RubyVersion),
-    (Get-JuliaVersion),
-    (Get-ClangVersions),
-    (Get-ClangFormatVersions),
-    (Get-ClangTidyVersions),
-    (Get-KotlinVersion)
+    (Get-Python3Version)
 )
-
-if ((Test-IsUbuntu18) -or (Test-IsUbuntu20)) {
-    $runtimesList += @(
-        (Get-MsbuildVersion),
-        (Get-MonoVersion),
-        (Get-ErlangVersion),
-        (Get-ErlangRebar3Version),
-        (Get-SwiftVersion)
-    )
-}
 
 $markdown += New-MDList -Style Unordered -Lines ($runtimesList | Sort-Object)
 
