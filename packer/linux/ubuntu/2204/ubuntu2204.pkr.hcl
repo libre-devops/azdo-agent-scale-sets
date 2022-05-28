@@ -92,8 +92,8 @@ source "azure-arm" "build" {
 
   os_type         = "Linux"
   image_offer     = "lbdo-azdo-ubuntu-22.04"
-  image_publisher = "Libre DevOps"
-  image_sku       = "latest"
+  image_publisher = "Libre-DevOps"
+  image_sku       = "2204"
   vm_size         = "Standard_D4s_v4"
 
   managed_image_name                = "lbdo-azdo-ubuntu-22.04"
@@ -107,8 +107,8 @@ source "azure-arm" "build" {
 
   shared_image_gallery_destination {
     gallery_name   = var.gallery_name
-    image_name     = "lbdo-azdo-ubuntu-22.04-latest"
-    image_version  = formatdate("YYYYMM", timestamp())
+    image_name     = "lbdo-azdo-ubuntu-22.04"
+    image_version  = formatdate("YYYY.MM", timestamp())
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
         replication_regions = [

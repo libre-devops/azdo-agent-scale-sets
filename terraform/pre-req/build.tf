@@ -27,20 +27,20 @@ module "image" {
   tags     = module.rg.rg_tags
 
   images = {
-    img01 = {
+    "lbdo-azdo-ubuntu-22.04" = {
       gallery_name             = module.gallery.gallery_name
       is_image_specialised     = false
       image_hyper_v_generation = "V2"
       image_os_type            = "Linux"
 
       identifier = {
-        publisher = "LibreDevOps"
-        offer     = "Image2"
-        sku       = "Latest"
+        publisher = "Libre-DevOps"
+        offer     = "azdo-ubuntu"
+        sku       = "2204"
 
       }
 
-      image_version_number = formatdate("YYYYMM", timestamp())
+      image_version_number = formatdate("YYYY.MM", timestamp())
       exclude_from_latest  = false
 
       image_version_target_region = {
