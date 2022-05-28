@@ -43,7 +43,7 @@ module "image" {
       image_version_number = formatdate("YYYYMM", timestamp())
       exclude_from_latest  = false
 
-      target_region = {
+      image_version_target_region = {
         image_replication_zone_location = "westeurope"
       }
     }
