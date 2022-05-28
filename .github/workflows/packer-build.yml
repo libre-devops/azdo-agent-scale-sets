@@ -19,10 +19,6 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Packer GitHub Actions
-        uses: hashicorp/packer-github-actions@v0.2.0
-        with:
-          command: build
-          target: "packer/linux/ubuntu/2204/ubuntu2204.pkr.hcl"
         env:
           PKR_VAR_client_id: ${{ secrets.SpokeSvpClientId }}
           PKR_VAR_client_secret: ${{ secrets.SpokeSvpClientSecret }}
@@ -30,3 +26,8 @@ jobs:
           PKR_VAR_tenant_id: ${{ secrets.SpokeTenantId }}
           PKR_VAR_dockerhub_login: ${{ secrets.DockerHubUsername }}
           PKR_VAR_dockerhub_password: ${{ secrets.DockerHubPassword }}
+        uses: hashicorp/packer-github-actions@v0.2.0
+        with:
+          command: build
+          target: "packer/linux/ubuntu/2204/ubuntu2204.pkr.hcl"
+

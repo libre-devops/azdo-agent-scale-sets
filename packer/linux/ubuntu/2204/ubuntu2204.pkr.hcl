@@ -3,25 +3,6 @@ variable "capture_name_prefix" {
   default = "packer"
 }
 
-variable "client_id" {
-  type = string
-}
-
-variable "client_secret" {
-  type      = string
-  sensitive = true
-}
-
-variable "dockerhub_login" {
-  type        = string
-  description = "The docker hub login, passed as a PKR_VAR"
-}
-
-variable "dockerhub_password" {
-  type        = string
-  description = "The docker hub password passed as a PKR_VAR"
-}
-
 variable "helper_script_folder" {
   type    = string
   default = "/imagegeneration/helpers"
@@ -52,14 +33,31 @@ variable "installer_script_folder" {
   default = "/imagegeneration/installers"
 }
 
-variable "install_password" {
-  type    = string
-  default = ""
-}
-
 variable "location" {
   type    = string
   default = "West Europe"
+}
+
+variable "client_id" {
+  type        = string
+  description = "The client id, passed as a PKR_VAR"
+}
+
+variable "client_secret" {
+  type        = string
+  sensitive   = true
+  description = "The client_secret, passed as a PKR_VAR"
+}
+
+variable "dockerhub_login" {
+  type        = string
+  description = "The docker hub login, passed as a PKR_VAR"
+}
+
+variable "dockerhub_password" {
+  type        = string
+  description = "The docker hub password passed as a PKR_VAR"
+  sensitive   = true
 }
 
 variable "subscription_id" {
@@ -81,7 +79,7 @@ variable "gallery_name" {
 variable "gallery_rg_name" {
   type        = string
   default     = "rg-ldo-euw-dev-build"
-  description = "The gallery resource group name, passed as a PKR_VAR"
+  description = "The gallery resource group name"
 }
 
 source "azure-arm" "build" {
