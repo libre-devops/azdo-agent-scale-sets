@@ -81,13 +81,13 @@ variable "tenant_id" {
 
 variable "gallery_name" {
   type        = string
-  default     = "galldoeuwdev01"
+  default     = "galldouksdev01"
   description = "The gallery name"
 }
 
 variable "gallery_rg_name" {
   type        = string
-  default     = "rg-ldo-euw-dev-build"
+  default     = "rg-ldo-uks-dev-build"
   description = "The gallery resource group name"
 }
 
