@@ -53,7 +53,8 @@ module "linux_scale_set" {
 
   ssh_public_key   = data.azurerm_ssh_public_key.mgmt_ssh_key.public_key
   use_simple_image = false
-  identity_type    = "SystemAssigned"
+  identity_type    = "UserAssigned"
+  identity_ids     = [data.azurerm_user_assigned_identity.mgmt_user_assigned_id.id]
   asg_name         = "asg-vmss${var.short}${var.loc}${terraform.workspace}-${var.short}-${var.loc}-${terraform.workspace}-01"
   admin_username   = "LibreDevOpsAdmin"
 
