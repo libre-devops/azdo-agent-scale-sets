@@ -36,7 +36,7 @@ variable "installer_script_folder" {
 
 variable "location" {
   type        = string
-  default     = "West Europe"
+  default     = "UK South"
   description = "Used in scripts"
 }
 
@@ -123,7 +123,7 @@ source "azure-arm" "build" {
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
     replication_regions = [
-      "westeurope"
+      "uksouth"
     ]
   }
 }
