@@ -124,7 +124,12 @@
         ]
     },
     "brew": [
-        {"name": "zstd"}
+        {"name": "zstd"},
+        {"name": "tfsec"},
+        {"name": "terraform-docs"},
+        {"name": "kubeval"},
+        {"name": "kubeaudit"},
+        {"name": "colordiff"}
     ],
     "docker": {
         "images": [
@@ -139,6 +144,14 @@
         {
             "package": "ansible-core",
             "cmd": "ansible"
+        },
+        {
+            "package": "terraform-compliance",
+            "cmd": "terraform-compliance"
+        },
+        {
+            "package": "checkov",
+            "cmd": "checkov"
         }
     ],
     "dotnet": {

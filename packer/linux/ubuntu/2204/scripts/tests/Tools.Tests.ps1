@@ -46,6 +46,18 @@ Describe "Ansible" {
     }
 }
 
+Describe "Checkov" {
+    It "Checkov" {
+        "checkov --version" | Should -ReturnZeroExitCode
+    }
+}
+
+Describe "Terraform-Compliance" {
+    It "Terraform-Compliance" {
+        "terraform-compliance --version" | Should -ReturnZeroExitCode
+    }
+}
+
 Describe "Terraform" {
     It "terraform" {
         "terraform --version" | Should -ReturnZeroExitCode

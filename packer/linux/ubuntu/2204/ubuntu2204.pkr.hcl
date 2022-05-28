@@ -1,43 +1,46 @@
-variable "capture_name_prefix" {
-  type    = string
-  default = "packer"
-}
-
 variable "helper_script_folder" {
-  type    = string
-  default = "/imagegeneration/helpers"
+  type        = string
+  default     = "/imagegeneration/helpers"
+  description = "Used in scripts"
 }
 
 variable "image_folder" {
-  type    = string
-  default = "/imagegeneration"
+  type        = string
+  default     = "/imagegeneration"
+  description = "Used in scripts"
 }
 
 variable "image_os" {
-  type    = string
-  default = "ubuntu22"
+  type        = string
+  default     = "ubuntu22"
+  description = "Used in scripts"
 }
 
 variable "image_version" {
-  type    = string
-  default = "dev"
+  type        = string
+  default     = "dev"
+  description = "Used in scripts"
 }
 
 variable "imagedata_file" {
-  type    = string
-  default = "/imagegeneration/imagedata.json"
+  type        = string
+  default     = "/imagegeneration/imagedata.json"
+  description = "Used in scripts"
 }
 
 variable "installer_script_folder" {
-  type    = string
-  default = "/imagegeneration/installers"
+  type        = string
+  default     = "/imagegeneration/installers"
+  description = "Used in scripts"
 }
 
 variable "location" {
-  type    = string
-  default = "West Europe"
+  type        = string
+  default     = "West Europe"
+  description = "Used in scripts"
 }
 
+// Uses the packer env inbuilt function - https://www.packer.io/docs/templates/hcl_templates/functions/contextual/env
 variable "client_id" {
   type        = string
   description = "The client id, passed as a PKR_VAR"
@@ -88,6 +91,9 @@ variable "gallery_rg_name" {
   description = "The gallery resource group name"
 }
 
+####################################################################################################################
+
+// Begins Packer build Section
 source "azure-arm" "build" {
 
   client_id                 = var.client_id
@@ -109,6 +115,7 @@ source "azure-arm" "build" {
   managed_image_name                = "lbdo-azdo-ubuntu-22.04"
   managed_image_resource_group_name = var.gallery_rg_name
 
+  // Shared image gallery is created by terraform in the pre-req step, as is the resource group.
   shared_image_gallery_destination {
     gallery_name   = var.gallery_name
     image_name     = "lbdo-azdo-ubuntu-22.04"
@@ -186,13 +193,13 @@ build {
     source      = "${path.root}/scripts/SoftwareReport"
   }
 
-  # Loads JSON file with toolset within
+  # Loads JSON file with toolset within - Needed
   provisioner "file" {
     destination = "${var.installer_script_folder}/toolset.json"
     source      = "${path.root}/toolsets/toolset-2204.json"
   }
 
-  # Primes image data file - Probably Unneeded
+  # Primes image data file - Probably Unneeded, leaving
   provisioner "shell" {
     environment_vars = ["IMAGE_VERSION=${var.image_version}", "IMAGEDATA_FILE=${var.imagedata_file}"]
     execute_command  = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
@@ -227,7 +234,7 @@ build {
     scripts          = ["${path.root}/scripts/installers/docker-compose.sh", "${path.root}/scripts/installers/docker-moby.sh"]
   }
 
-  # Installs packages added in the installers dir
+  # Installs packages added in the installers dir - Needed
   provisioner "shell" {
     environment_vars = ["HELPER_SCRIPTS=${var.helper_script_folder}", "INSTALLER_SCRIPT_FOLDER=${var.installer_script_folder}", "DEBIAN_FRONTEND=noninteractive"]
     execute_command  = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
@@ -312,6 +319,7 @@ build {
     scripts          = ["${path.root}/scripts/installers/post-deployment.sh"]
   }
 
+  # Adds Linux VM Agent for Azure - not Needed but extremely useful, so leaving.
   provisioner "shell" {
     execute_command = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
     inline          = ["sleep 30", "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"]

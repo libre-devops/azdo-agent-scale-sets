@@ -53,7 +53,6 @@ module "linux_scale_set" {
 
   ssh_public_key   = data.azurerm_ssh_public_key.mgmt_ssh_key.public_key
   use_simple_image = false
-  vm_os_simple     = "Ubuntu20.04"
   identity_type    = "SystemAssigned"
   asg_name         = "asg-vmss${var.short}${var.loc}${terraform.workspace}-${var.short}-${var.loc}-${terraform.workspace}-01"
   admin_username   = "LibreDevOpsAdmin"
@@ -67,6 +66,8 @@ module "linux_scale_set" {
       overprovision                   = false
       zones                           = ["1"]
       provision_vm_agent              = true
+
+      source_image_id = data.azurerm_shared_image.shared_image.id
 
       os_disk = {
         storage_account_type = "Standard_LRS"
