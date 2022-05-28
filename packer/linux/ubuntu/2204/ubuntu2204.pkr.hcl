@@ -108,7 +108,7 @@ source "azure-arm" "build" {
   shared_image_gallery_destination {
     gallery_name   = var.gallery_name
     image_name     = "lbdo-azdo-ubuntu-22.04"
-    image_version  = formatdate("YYYY.MM", timestamp())
+    image_version  = formatdate("YYYY.MM.DD", timestamp())
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
         replication_regions = [

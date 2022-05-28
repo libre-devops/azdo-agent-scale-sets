@@ -40,7 +40,7 @@ module "image" {
 
       }
 
-      image_version_number = formatdate("YYYY.MM", timestamp())
+      image_version_number = formatdate("YYYY.MM.DD", timestamp())
       exclude_from_latest  = false
 
       image_version_target_region = {
