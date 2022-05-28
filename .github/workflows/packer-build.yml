@@ -18,16 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Packer GitHub Actions
+      - name: Libre DevOps - Run Packer for Azure - GitHub Action
         env:
-          PKR_VAR_client_id: ${{ secrets.SpokeSvpClientId }}
-          PKR_VAR_client_secret: ${{ secrets.SpokeSvpClientSecret }}
-          PKR_VAR_subscription_id: ${{ secrets.SpokeSubId }}
-          PKR_VAR_tenant_id: ${{ secrets.SpokeTenantId }}
           PKR_VAR_dockerhub_login: ${{ secrets.DockerHubUsername }}
           PKR_VAR_dockerhub_password: ${{ secrets.DockerHubPassword }}
-        uses: hashicorp/packer-github-actions@v0.2.0
+        id: packer-build
+        uses: libre-devops/azure-packer-gh-action@v1
         with:
-          command: build
-          target: "packer/linux/ubuntu/2204/ubuntu2204.pkr.hcl"
+          packer-template-path: "packer/linux/ubuntu/2204/ubuntu2204.pkr.hcl"
+          packer-client-id: ${{ secrets.SpokeSvpClientId }}
+          packer-client-secret: ${{ secrets.SpokeSvpClientSecret }}
+          packer-subscription-id: ${{ secrets.SpokeSubId }}
+          packer-tenant-id: ${{ secrets.SpokeTenantId }}
 

@@ -23,6 +23,3 @@ ENVPATH=${ENVPATH%"\""}
 echo "PATH=$ENVPATH" | sudo tee -a /etc/environment
 echo "Updated /etc/environment: $(cat /etc/environment)"
 
-# Clean yarn and npm cache
-yarn cache clean
-npm cache clean --force

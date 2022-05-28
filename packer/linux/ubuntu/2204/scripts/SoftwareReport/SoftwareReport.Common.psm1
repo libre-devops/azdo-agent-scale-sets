@@ -36,10 +36,7 @@ function Get-HelmVersion {
     return "Helm $helmVersion"
 }
 
-function Get-YarnVersion {
-    $yarnVersion = yarn --version
-    return "Yarn $yarnVersion"
-}
+
 
 function Get-PipVersion {
     $result = Get-CommandResult "pip --version"
