@@ -74,11 +74,13 @@ variable "tenant_id" {
 
 variable "gallery_name" {
   type        = string
-  description = "The gallery name, passed as a PKR_VAR"
+  default     = "galldoeuwdev01"
+  description = "The gallery name"
 }
 
 variable "gallery_rg_name" {
   type        = string
+  default     = "rg-ldo-euw-dev-build"
   description = "The gallery resource group name, passed as a PKR_VAR"
 }
 
@@ -91,7 +93,7 @@ source "azure-arm" "build" {
   build_resource_group_name = var.gallery_rg_name
   user_data_file            = "./scripts/base/configure-legacy-ssh.sh" # Needed due to bug https://github.com/hashicorp/packer/issues/11656
 
-  // The sku you want to base your image off
+  // The sku you want to base your image off - In this case - Ubuntu 22
   os_type                 = "Linux"
   image_publisher         = "Canonical"
   image_offer             = "0001-com-ubuntu-server-jammy"
@@ -99,6 +101,7 @@ source "azure-arm" "build" {
   vm_size                 = "Standard_D4s_v4"
   temporary_key_pair_type = "ed25519"
 
+  // Name of Image which is created by Terraform
   managed_image_name                = "lbdo-azdo-ubuntu-22.04"
   managed_image_resource_group_name = var.gallery_rg_name
 

@@ -28,7 +28,5 @@ jobs:
           PKR_VAR_client_secret: ${{ secrets.SpokeSvpClientSecret }}
           PKR_VAR_subscription_id: ${{ secrets.SpokeSubId }}
           PKR_VAR_tenant_id: ${{ secrets.SpokeTenantId }}
-          PKR_VAR_gallery_name: ${{ secrets.SpokeImageGalleryName }}
-          PKR_VAR_gallery_rg_name: ${{ secrets.SpokeImageGalleryRgName }}
           PKR_VAR_dockerhub_login: ${{ secrets.DockerHubUsername }}
           PKR_VAR_dockerhub_password: ${{ secrets.DockerHubPassword }}
