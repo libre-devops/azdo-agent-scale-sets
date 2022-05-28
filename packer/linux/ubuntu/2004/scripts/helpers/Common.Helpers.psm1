@@ -71,12 +71,6 @@ function Get-ToolsetValue {
     return $jsonNode
 }
 
-function Get-AndroidPackages {
-    $androidSDKManagerPath = "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"
-    $androidPackages = & $androidSDKManagerPath --list --verbose 2>&1
-    return $androidPackages
-}
-
 function Get-EnvironmentVariable($variable) {
     return [System.Environment]::GetEnvironmentVariable($variable)
 }

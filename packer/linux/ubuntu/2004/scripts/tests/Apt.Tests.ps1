@@ -49,11 +49,6 @@ Describe "Apt" {
             $toolName = "netstat"
         }
 
-        if ($toolName -eq "mercurial")
-        {
-            $toolName = "hg"
-        }
-
         (Get-Command -Name $toolName).CommandType | Should -BeExactly "Application"
     }
 }

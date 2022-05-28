@@ -63,12 +63,12 @@ variable "location" {
 }
 
 variable "subscription_id" {
-  type    = string
+  type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
 }
 
 variable "tenant_id" {
-  type    = string
+  type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
 }
 
@@ -89,21 +89,18 @@ source "azure-arm" "build" {
   subscription_id           = var.subscription_id
   tenant_id                 = var.tenant_id
   build_resource_group_name = var.gallery_rg_name
+  user_data_file            = "./scripts/base/configure-legacy-ssh.sh" # Needed due to bug https://github.com/hashicorp/packer/issues/11656
 
-  os_type         = "Linux"
-  image_offer     = "lbdo-azdo-ubuntu-22.04"
-  image_publisher = "Libre-DevOps"
-  image_sku       = "2204"
-  vm_size         = "Standard_D4s_v4"
+  // The sku you want to base your image off
+  os_type                 = "Linux"
+  image_publisher         = "Canonical"
+  image_offer             = "0001-com-ubuntu-server-jammy"
+  image_sku               = "22_04-lts"
+  vm_size                 = "Standard_D4s_v4"
+  temporary_key_pair_type = "ed25519"
 
   managed_image_name                = "lbdo-azdo-ubuntu-22.04"
   managed_image_resource_group_name = var.gallery_rg_name
-
-  plan_info {
-    plan_name      = "cis-ubuntu2004-l1"
-    plan_product   = "cis-ubuntu-linux-2004-l1"
-    plan_publisher = "center-for-internet-security-inc"
-  }
 
   shared_image_gallery_destination {
     gallery_name   = var.gallery_name
@@ -111,7 +108,7 @@ source "azure-arm" "build" {
     image_version  = formatdate("YYYY.MM.DD", timestamp())
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
-        replication_regions = [
+    replication_regions = [
       "westeurope"
     ]
   }
@@ -298,14 +295,7 @@ build {
   # Runs Pester tests - Needed
   provisioner "shell" {
     environment_vars = ["IMAGE_VERSION=${var.image_version}", "INSTALLER_SCRIPT_FOLDER=${var.installer_script_folder}"]
-    inline           = ["pwsh -File ${var.image_folder}/SoftwareReport/SoftwareReport.Generator.ps1 -OutputDirectory ${var.image_folder}", "pwsh -File ${var.image_folder}/tests/RunAll-Tests.ps1 -OutputDirectory ${var.image_folder}"]
-  }
-
-  # Adds readme - Probably Uneeded
-  provisioner "file" {
-    destination = "${path.root}/Ubuntu2204-Readme.md"
-    direction   = "download"
-    source      = "${var.image_folder}/Ubuntu-Readme.md"
+    inline           = ["pwsh -File ${var.image_folder}/tests/RunAll-Tests.ps1 -OutputDirectory ${var.image_folder}"]
   }
 
   # Post-deployment - Needed
