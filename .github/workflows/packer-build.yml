@@ -22,7 +22,7 @@ jobs:
         uses: hashicorp/packer-github-actions@v0.2.0
         with:
           command: build
-          target: "packer/linux/ubuntu/ubuntu2204/ubuntu2204.pkr.hcl"
+          target: "packer/linux/ubuntu/2204/ubuntu2204.pkr.hcl"
         env:
           PKR_VAR_client_id: ${{ secrets.SpokeSvpClientId }}
           PKR_VAR_client_secret: ${{ secrets.SpokeSvpClientSecret }}
