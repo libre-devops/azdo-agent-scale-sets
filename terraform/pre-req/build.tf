@@ -37,14 +37,6 @@ module "image" {
         publisher = "Libre-DevOps"
         offer     = "azdo-ubuntu"
         sku       = "2204"
-
-      }
-
-      image_version_number = formatdate("YYYY.MM.DD", timestamp())
-      exclude_from_latest  = false
-
-      image_version_target_region = {
-        image_replication_zone_location = "westeurope"
       }
     }
   }
