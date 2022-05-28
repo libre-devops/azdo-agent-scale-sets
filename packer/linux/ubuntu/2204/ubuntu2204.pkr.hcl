@@ -77,7 +77,7 @@ variable "gallery_name" {
   description = "The gallery name, passed as a PKR_VAR"
 }
 
-variable "gallery_name_rg_name" {
+variable "gallery_rg_name" {
   type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
 }
@@ -96,7 +96,7 @@ source "azure-arm" "build" {
   image_sku       = "latest"
   vm_size         = "Standard_D4s_v4"
 
-  managed_image_name                = "lbdo-azdo-ubuntu-22.04-latest"
+  managed_image_name                = "lbdo-azdo-ubuntu-22.04"
   managed_image_resource_group_name = var.gallery_rg_name
 
   plan_info {
@@ -108,14 +108,17 @@ source "azure-arm" "build" {
   shared_image_gallery_destination {
     gallery_name   = var.gallery_name
     image_name     = "lbdo-azdo-ubuntu-22.04-latest"
-    image_version  = var.image_version
+    image_version  = formatdate("YYYYMM", timestamp())
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
+        replication_regions = [
+      "westeurope"
+    ]
   }
 }
 
 build {
-  sources = ["source.azure-arm.build_vhd"]
+  sources = ["source.azure-arm.build"]
 
   # Creates a folder for the prep of the image - Needed
   provisioner "shell" {

@@ -27,16 +27,24 @@ module "image" {
   tags     = module.rg.rg_tags
 
   images = {
-    "lbdo-azdo-ubuntu-22.04" = {
+    img01 = {
       gallery_name             = module.gallery.gallery_name
       is_image_specialised     = false
-      image_hyper_v_generation = "V1"
+      image_hyper_v_generation = "V2"
       image_os_type            = "Linux"
 
       identifier = {
         publisher = "LibreDevOps"
-        offer     = "lbdo-azdo-ubuntu-22.04"
-        sku       = "latest"
+        offer     = "Image2"
+        sku       = "Latest"
+
+      }
+
+      image_version_number = formatdate("YYYYMM", timestamp())
+      exclude_from_latest  = false
+
+      target_region = {
+        image_replication_zone_location = "westeurope"
       }
     }
   }
