@@ -41,33 +41,39 @@ variable "location" {
 variable "client_id" {
   type        = string
   description = "The client id, passed as a PKR_VAR"
+  default     = env("PKR_VAR_client_id")
 }
 
 variable "client_secret" {
   type        = string
   sensitive   = true
   description = "The client_secret, passed as a PKR_VAR"
+  default     = env("PKR_VAR_client_secret")
 }
 
 variable "dockerhub_login" {
   type        = string
   description = "The docker hub login, passed as a PKR_VAR"
+  default     = env("PKR_VAR_dockerhub_login")
 }
 
 variable "dockerhub_password" {
   type        = string
   description = "The docker hub password passed as a PKR_VAR"
   sensitive   = true
+  default     = env("PKR_VAR_dockerhub_password")
 }
 
 variable "subscription_id" {
   type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
+  default     = env("PKR_VAR_subscription_id")
 }
 
 variable "tenant_id" {
   type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
+  default     = env("PKR_VAR_tenant_id")
 }
 
 variable "gallery_name" {
