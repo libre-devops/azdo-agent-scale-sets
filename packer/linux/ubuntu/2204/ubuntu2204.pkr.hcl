@@ -95,7 +95,7 @@ source "azure-arm" "build" {
   subscription_id           = var.subscription_id
   tenant_id                 = var.tenant_id
   build_resource_group_name = var.gallery_rg_name
-  user_data_file            = "./scripts/base/configure-legacy-ssh.sh" # Needed due to bug https://github.com/hashicorp/packer/issues/11656
+  user_data_file            = "${path.root}/scripts/base/configure-legacy-ssh.sh" # Needed due to bug https://github.com/hashicorp/packer/issues/11656
 
   // The sku you want to base your image off - In this case - Ubuntu 22
   os_type                 = "Linux"

@@ -1,4 +1,4 @@
-name: 'Terraform Destroy'
+name: 'Pre-Req Terraform Destroy'
 
 # Allow run manually
 on:
@@ -22,13 +22,13 @@ jobs:
         id: terraform-build
         uses: libre-devops/azure-terraform-gh-action@v1
         with:
-          terraform-path: "terraform/scale-set"
+          terraform-path: "terraform/pre-req"
           terraform-workspace-name: "dev"
           terraform-backend-storage-rg-name: ${{ secrets.SpokeSaRgName }}
           terraform-backend-storage-account-name: ${{ secrets.SpokeSaName }}
           terraform-backend-blob-container-name: ${{ secrets.SpokeSaBlobContainerName }}
           terraform-backend-storage-access-key: ${{ secrets.SpokeSaPrimaryKey }}
-          terraform-backend-state-name: "lbdo-dev-gh-ss.terraform.tfstate"
+          terraform-backend-state-name: "lbdo-dev-gh.terraform.tfstate"
           terraform-provider-client-id: ${{ secrets.SpokeSvpClientId }}
           terraform-provider-client-secret: ${{ secrets.SpokeSvpClientSecret }}
           terraform-provider-subscription-id: ${{ secrets.SpokeSubId }}
