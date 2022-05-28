@@ -4,7 +4,7 @@ variable "capture_name_prefix" {
 }
 
 variable "client_id" {
-  type    = string
+  type = string
 }
 
 variable "client_secret" {
@@ -13,13 +13,13 @@ variable "client_secret" {
 }
 
 variable "dockerhub_login" {
-  type    = string
-      description = "The docker hub login, passed as a PKR_VAR"
+  type        = string
+  description = "The docker hub login, passed as a PKR_VAR"
 }
 
 variable "dockerhub_password" {
-  type    = string
-      description = "The docker hub password passed as a PKR_VAR"
+  type        = string
+  description = "The docker hub password passed as a PKR_VAR"
 }
 
 variable "helper_script_folder" {
@@ -53,7 +53,7 @@ variable "installer_script_folder" {
 }
 
 variable "install_password" {
-  type  = string
+  type    = string
   default = ""
 }
 
@@ -73,28 +73,28 @@ variable "tenant_id" {
 }
 
 variable "gallery_name" {
-  type    = string
+  type        = string
   description = "The gallery name, passed as a PKR_VAR"
 }
 
 variable "gallery_name_rg_name" {
-  type    = string
-    description = "The gallery resource group name, passed as a PKR_VAR"
+  type        = string
+  description = "The gallery resource group name, passed as a PKR_VAR"
 }
 
 source "azure-arm" "build" {
 
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
+  client_id                 = var.client_id
+  client_secret             = var.client_secret
+  subscription_id           = var.subscription_id
+  tenant_id                 = var.tenant_id
   build_resource_group_name = var.gallery_rg_name
 
-  os_type                   = "Linux"
-  image_offer               = "lbdo-azdo-ubuntu-22.04"
-  image_publisher           = "Libre DevOps"
-  image_sku                 = "latest"
-  vm_size                   = "Standard_D4s_v4"
+  os_type         = "Linux"
+  image_offer     = "lbdo-azdo-ubuntu-22.04"
+  image_publisher = "Libre DevOps"
+  image_sku       = "latest"
+  vm_size         = "Standard_D4s_v4"
 
   managed_image_name                = "lbdo-azdo-ubuntu-22.04-latest"
   managed_image_resource_group_name = var.gallery_rg_name
@@ -106,9 +106,9 @@ source "azure-arm" "build" {
   }
 
   shared_image_gallery_destination {
-    gallery_name  = var.gallery_name
-    image_name    = "lbdo-azdo-ubuntu-22.04-latest"
-    image_version = var.image_version
+    gallery_name   = var.gallery_name
+    image_name     = "lbdo-azdo-ubuntu-22.04-latest"
+    image_version  = var.image_version
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
   }
@@ -224,24 +224,24 @@ build {
   provisioner "shell" {
     environment_vars = ["HELPER_SCRIPTS=${var.helper_script_folder}", "INSTALLER_SCRIPT_FOLDER=${var.installer_script_folder}", "DEBIAN_FRONTEND=noninteractive"]
     execute_command  = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
-    scripts          = [
-                        "${path.root}/scripts/installers/azcopy.sh",
-                        "${path.root}/scripts/installers/azure-cli.sh",
-                        "${path.root}/scripts/installers/azure-devops-cli.sh",
-                        "${path.root}/scripts/installers/basic.sh",
-                        "${path.root}/scripts/installers/containers.sh",
-                        "${path.root}/scripts/installers/dotnetcore-sdk.sh",
-                        "${path.root}/scripts/installers/git.sh",
-                        "${path.root}/scripts/installers/github-cli.sh",
-                        "${path.root}/scripts/installers/kubernetes-tools.sh",
-                        "${path.root}/scripts/installers/terraform.sh",
-                        "${path.root}/scripts/installers/packer.sh",
-                        "${path.root}/scripts/installers/vcpkg.sh",
-                        "${path.root}/scripts/installers/dpkg-config.sh",
-                        "${path.root}/scripts/installers/yq.sh",
-                        "${path.root}/scripts/installers/pypy.sh",
-                        "${path.root}/scripts/installers/python.sh",
-                        ]
+    scripts = [
+      "${path.root}/scripts/installers/azcopy.sh",
+      "${path.root}/scripts/installers/azure-cli.sh",
+      "${path.root}/scripts/installers/azure-devops-cli.sh",
+      "${path.root}/scripts/installers/basic.sh",
+      "${path.root}/scripts/installers/containers.sh",
+      "${path.root}/scripts/installers/dotnetcore-sdk.sh",
+      "${path.root}/scripts/installers/git.sh",
+      "${path.root}/scripts/installers/github-cli.sh",
+      "${path.root}/scripts/installers/kubernetes-tools.sh",
+      "${path.root}/scripts/installers/terraform.sh",
+      "${path.root}/scripts/installers/packer.sh",
+      "${path.root}/scripts/installers/vcpkg.sh",
+      "${path.root}/scripts/installers/dpkg-config.sh",
+      "${path.root}/scripts/installers/yq.sh",
+      "${path.root}/scripts/installers/pypy.sh",
+      "${path.root}/scripts/installers/python.sh",
+    ]
   }
 
   # Installs everything in toolset.json as part of the toolcache section (which is basically everything) - Needed
@@ -292,7 +292,7 @@ build {
     script          = "${path.root}/scripts/base/apt-mock-remove.sh"
   }
 
-   # Runs Pester tests - Needed
+  # Runs Pester tests - Needed
   provisioner "shell" {
     environment_vars = ["IMAGE_VERSION=${var.image_version}", "INSTALLER_SCRIPT_FOLDER=${var.installer_script_folder}"]
     inline           = ["pwsh -File ${var.image_folder}/SoftwareReport/SoftwareReport.Generator.ps1 -OutputDirectory ${var.image_folder}", "pwsh -File ${var.image_folder}/tests/RunAll-Tests.ps1 -OutputDirectory ${var.image_folder}"]
