@@ -58,6 +58,13 @@ Describe "Terraform-Compliance" {
     }
 }
 
+# TFenv is used to install terraform
+Describe "Tfenv" {
+    It "tfenv" {
+        "tfenv list" | Should -ReturnZeroExitCode
+    }
+}
+
 Describe "Vcpkg" {
     It "vcpkg" {
         "vcpkg version" | Should -ReturnZeroExitCode
