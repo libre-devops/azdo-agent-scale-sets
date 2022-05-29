@@ -61,7 +61,7 @@ module "linux_scale_set" {
   settings = {
     "vmss${var.short}${var.loc}${terraform.workspace}01" = {
 
-      sku                             = "Standard_B4ms"
+      sku                             = "Standard_D4s_v4"
       disable_password_authentication = true
       instances                       = 2
       overprovision                   = false
