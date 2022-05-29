@@ -58,7 +58,7 @@ Describe "Terraform-Compliance" {
     }
 }
 
-# TFenv is used to install terraform
+# TFenv is used to install terraform and this will test a version is installed
 Describe "Tfenv" {
     It "tfenv" {
         "tfenv list" | Should -ReturnZeroExitCode
