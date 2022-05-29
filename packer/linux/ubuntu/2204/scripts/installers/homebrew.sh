@@ -37,4 +37,7 @@ for package in $brew_packages; do
     fi
 done
 
+# Execute TFenv install
+tfenv install latest
+
 invoke_tests "Tools" "Homebrew"
