@@ -81,13 +81,13 @@ variable "tenant_id" {
 
 variable "gallery_name" {
   type        = string
-  default     = "galldouksdev01"
+  default     = "galldoeuwdev01"
   description = "The wgallery name"
 }
 
 variable "gallery_rg_name" {
   type        = string
-  default     = "rg-ldo-uks-dev-build"
+  default     = "rg-ldo-euw-dev-build"
   description = "The gallery resource group name"
 }
 
@@ -123,7 +123,7 @@ source "azure-arm" "build" {
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
     replication_regions = [
-      "uksouth"
+      "westeurope"
     ]
   }
 }
