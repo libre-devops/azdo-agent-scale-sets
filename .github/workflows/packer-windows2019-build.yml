@@ -1,4 +1,4 @@
-name: 'Packer Build'
+name: 'Windows Packer Build'
 
 # Allow run manually
 on:
