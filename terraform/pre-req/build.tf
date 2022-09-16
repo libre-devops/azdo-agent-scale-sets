@@ -151,8 +151,4 @@ module "run_command_lnx" {
   os_type = "linux"
 
   command = "apt-get update && apt-get dist-upgrade -y && apt-get install git unzip zip curl gcc dos2unix -y && apt-get autoclean && exit 0"
-
-  lifecycle {
-    ignore_changes = all
-  }
 }
