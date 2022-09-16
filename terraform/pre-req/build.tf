@@ -46,7 +46,7 @@ module "bastion" {
   vnet_rg_name = module.network.vnet_rg_name
   vnet_name    = module.network.vnet_name
 
-  bas_subnet_iprange = "10.0.0.4.0/26"
+  bas_subnet_iprange = "10.0.4.0/26"
 
   bas_nsg_name     = "nsg-bas-${var.short}-${var.loc}-${terraform.workspace}-01"
   bas_nsg_location = module.rg.rg_location
