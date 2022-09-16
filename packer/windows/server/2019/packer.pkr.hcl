@@ -111,6 +111,21 @@ variable "gallery_rg_name" {
   description = "The gallery resource group name"
 }
 
+variable "virtual_network_name" {
+  type    = string
+  default = "rg-ldo-euw-dev-build"
+}
+
+variable "virtual_network_resource_group_name" {
+  type    = string
+  default = "rg-ldo-euw-dev-build "
+}
+
+variable "virtual_network_subnet_name" {
+  type    = string
+  default = "${env("VNET_SUBNET")}"
+}
+
 
 locals {
   install_password = trim(uuidv4(), "-")
