@@ -38,6 +38,19 @@ module "image" {
         offer     = "azdo-ubuntu"
         sku       = "2204"
       }
+
+      "lbdo-azdo-windows-2019" = {
+        gallery_name             = module.gallery.gallery_name
+        is_image_specialised     = false
+        image_hyper_v_generation = "V1"
+        image_os_type            = "Windows"
+
+        identifier = {
+          publisher = "Libre-DevOps"
+          offer     = "azdo-windows"
+          sku       = "2019"
+        }
+      }
     }
   }
 }
