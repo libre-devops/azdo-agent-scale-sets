@@ -27,7 +27,7 @@ module "network" {
     "sn3-${module.network.vnet_name}" = ["Microsoft.AzureActiveDirectory"]      // Adds extra subnet endpoints to sn3-vnet-ldo-euw-dev-01
   }
 }
-A
+
 module "nsg" {
   source = "registry.terraform.io/libre-devops/nsg/azurerm"
 
