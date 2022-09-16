@@ -1,3 +1,9 @@
+variable "agent_tools_directory" {
+  type        = string
+  default     = "C:\\hostedtoolcache\\windows"
+  description = "Place of helper scripts"
+}
+
 variable "helper_script_folder" {
   type        = string
   default     = "C:\\Program Files\\WindowsPowerShell\\Modules\\"
@@ -250,11 +256,6 @@ build {
       "${path.root}/scripts/Installers/Install-JavaTools.ps1",
       "${path.root}/scripts/Installers/Install-Kotlin.ps1"
     ]
-  }
-
-  provisioner "powershell" {
-    execution_policy = "remotesigned"
-    scripts          = ["${path.root}/scripts/Installers/Install-ServiceFabricSDK.ps1"]
   }
 
   provisioner "windows-restart" {
