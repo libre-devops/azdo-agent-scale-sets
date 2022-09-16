@@ -112,20 +112,28 @@ variable "gallery_rg_name" {
 }
 
 variable "virtual_network_name" {
-  type    = string
-  default = "rg-ldo-euw-dev-build"
+  type        = string
+  default     = "vnet-ldo-euw-dev-01"
+  description = "The name of the vnet"
 }
 
 variable "virtual_network_resource_group_name" {
-  type    = string
-  default = "rg-ldo-euw-dev-build "
+  type        = string
+  default     = "rg-ldo-euw-dev-build"
+  description = "The name of the resource group the vnet is in"
 }
 
 variable "virtual_network_subnet_name" {
-  type    = string
-  default = "${env("VNET_SUBNET")}"
+  type        = string
+  default     = "sn1-vnet-ldo-euw-dev-01"
+  description = "The subnet the VM should be oput in"
 }
 
+variable "private_virtual_network_with_public_ip" {
+  type        = bool
+  default     = false
+  description = "Determines whether packer should attempt public IP communication"
+}
 
 locals {
   install_password = trim(uuidv4(), "-")
@@ -145,9 +153,15 @@ source "azure-arm" "build" {
   image_sku       = "2019-Datacenter"
   vm_size         = "Standard_D4s_v4"
 
+  communicator   = "winrm"
   winrm_insecure = "true"
   winrm_use_ssl  = "true"
   winrm_username = "packer"
+
+  virtual_network_name                   = var.virtual_network_name
+  virtual_network_resource_group_name    = var.virtual_network_resource_group_name
+  virtual_network_subnet_name            = var.virtual_network_subnet_name
+  private_virtual_network_with_public_ip = var.private_virtual_network_with_public_ip
 
   // Name of Image which is created by Terraform
   managed_image_name                = "lbdo-azdo-ubuntu-22.04"
@@ -219,7 +233,10 @@ build {
   }
 
   provisioner "powershell" {
-    environment_vars = ["IMAGE_VERSION=${var.image_version}", "IMAGE_OS=${var.image_os}", "AGENT_TOOLSDIRECTORY=${var.agent_tools_directory}", "IMAGEDATA_FILE=${var.imagedata_file}"]
+    environment_vars = [
+      "IMAGE_VERSION=${var.image_version}", "IMAGE_OS=${var.image_os}",
+      "AGENT_TOOLSDIRECTORY=${var.agent_tools_directory}", "IMAGEDATA_FILE=${var.imagedata_file}"
+    ]
     execution_policy = "unrestricted"
     scripts = [
       "${path.root}/scripts/Installers/Configure-Antivirus.ps1",
@@ -331,11 +348,16 @@ build {
 
   provisioner "powershell" {
     pause_before = "2m0s"
-    scripts      = ["${path.root}/scripts/Installers/Wait-WindowsUpdatesForInstall.ps1", "${path.root}/scripts/Tests/RunAll-Tests.ps1"]
+    scripts = [
+      "${path.root}/scripts/Installers/Wait-WindowsUpdatesForInstall.ps1",
+      "${path.root}/scripts/Tests/RunAll-Tests.ps1"
+    ]
   }
 
   provisioner "powershell" {
-    inline = ["if (-not (Test-Path ${var.image_folder}\\Tests\\testResults.xml)) { throw '${var.image_folder}\\Tests\\testResults.xml not found' }"]
+    inline = [
+      "if (-not (Test-Path ${var.image_folder}\\Tests\\testResults.xml)) { throw '${var.image_folder}\\Tests\\testResults.xml not found' }"
+    ]
   }
 
   provisioner "powershell" {
@@ -360,7 +382,8 @@ build {
     inline = [
       "if( Test-Path $Env:SystemRoot\\System32\\Sysprep\\unattend.xml ){ rm $Env:SystemRoot\\System32\\Sysprep\\unattend.xml -Force}",
       "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit",
-    "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"]
+      "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"
+    ]
   }
 
 }

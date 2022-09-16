@@ -91,6 +91,30 @@ variable "gallery_rg_name" {
   description = "The gallery resource group name"
 }
 
+variable "virtual_network_name" {
+  type        = string
+  default     = "vnet-ldo-euw-dev-01"
+  description = "The name of the vnet"
+}
+
+variable "virtual_network_resource_group_name" {
+  type        = string
+  default     = "rg-ldo-euw-dev-build"
+  description = "The name of the resource group the vnet is in"
+}
+
+variable "virtual_network_subnet_name" {
+  type        = string
+  default     = "sn1-vnet-ldo-euw-dev-01"
+  description = "The subnet the VM should be oput in"
+}
+
+variable "private_virtual_network_with_public_ip" {
+  type        = bool
+  default     = false
+  description = "Determines whether packer should attempt public IP communication"
+}
+
 ####################################################################################################################
 
 // Begins Packer build Section
@@ -110,6 +134,11 @@ source "azure-arm" "build" {
   image_sku               = "22_04-lts"
   vm_size                 = "Standard_D4s_v4"
   temporary_key_pair_type = "ed25519"
+
+  virtual_network_name                   = var.virtual_network_name
+  virtual_network_resource_group_name    = var.virtual_network_resource_group_name
+  virtual_network_subnet_name            = var.virtual_network_subnet_name
+  private_virtual_network_with_public_ip = var.private_virtual_network_with_public_ip
 
   // Name of Image which is created by Terraform
   managed_image_name                = "lbdo-azdo-ubuntu-22.04"
