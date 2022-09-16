@@ -1,46 +1,51 @@
 variable "helper_script_folder" {
-  type    = string
-  default = "C:\\Program Files\\WindowsPowerShell\\Modules\\"
+  type        = string
+  default     = "C:\\Program Files\\WindowsPowerShell\\Modules\\"
+  description = "Name of helper script folder"
 }
 
 variable "image_folder" {
-  type    = string
-  default = "C:\\image"
+  type        = string
+  default     = "C:\\image"
+  description = "Name of Image folder"
 }
 
 variable "image_os" {
-  type    = string
-  default = "win19"
+  type        = string
+  default     = "win19"
+  description = "OS flag"
 }
 
 variable "image_version" {
-  type    = string
-  default = "dev"
+  type        = string
+  default     = "dev"
+  description = "Image version name"
 }
 
 variable "imagedata_file" {
-  type    = string
-  default = "C:\\imagedata.json"
+  type        = string
+  default     = "C:\\imagedata.json"
+  description = "Place for image date"
+
 }
 
 variable "install_password" {
-  type      = string
-  sensitive = true
+  type        = string
+  sensitive   = true
+  default     = env("PKR_VAR_install_password")
+  description = "Name of user to run scripts"
 }
 
 variable "install_user" {
-  type    = string
-  default = "installer"
-}
-
-vaable "resource_group" {
-  type    = string
-  default = "${env("ARM_RESOURCE_GROUP")}"
+  type        = string
+  default     = "installer"
+  description = "Name of user to run scripts"
 }
 
 variable "vm_size" {
-  type    = string
-  default = "Standard_B4ms"
+  type        = string
+  default     = "Standard_B4ms"
+  description = "Packer orchestrated build Vm size"
 }
 
 variable "location" {
