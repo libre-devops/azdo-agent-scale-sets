@@ -150,5 +150,5 @@ module "run_command_lnx" {
   vm_name = element(module.lnx_vm.vm_name, 0)
   os_type = "linux"
 
-  command = "apt-get update && apt-get dist-upgrade -y && apt-get install git unzip zip curl gcc dos2unix -y && apt-get autoclean && exit 0"
+  command = "apt-get update && apt-get dist-upgrade -y && apt-get install git unzip zip curl gcc dos2unix jq -y && apt-get autoclean && exit 0"
 }

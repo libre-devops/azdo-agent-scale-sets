@@ -2,6 +2,14 @@
 
 LSB_RELEASE=$(lsb_release -rs)
 USER=$(whoami)
+USER="actions"
+REPO="runner"
+OS="linux"
+ARCH="x64"
+PACKAGE="tar.gz"
+ACTIONS_URL="https://github.com/libre-devops/azdo-agent-scale-sets"
+TOKEN="blah"
+
 
 echo -en "\n" | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" && \
     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bash_profile && \
@@ -35,6 +43,7 @@ if ! IsPackageInstalled $docker_package; then
     sudo apt-get install -y moby-engine moby-cli
     sudo apt-get install --no-install-recommends -y moby-buildx
     sudo apt-get install -y moby-compose
+    sudo usermod -aG docker "${USER}"
 else
     echo "Docker ($docker_package) is already installed"
 fi
@@ -53,14 +62,6 @@ docker info
 docker logout
 
 ###########################################################################################################################################
-
-USER="actions"
-REPO="runner"
-OS="linux"
-ARCH="x64"
-PACKAGE="tar.gz"
-ACTIONS_URL="https://github.com/libre-devops/azdo-agent-scale-sets"
-TOKEN="blah"
 
 runnerLatestAgentVersion="$(curl --silent "https://api.github.com/repos/${USER}/${REPO}/releases/latest" | jq -r .tag_name)"
 strippedTagRunnerAgentVersion="$(echo "${runnerLatestAgentVersion}" | sed 's/v//')" && \
