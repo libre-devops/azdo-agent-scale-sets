@@ -7,7 +7,7 @@ on:
 jobs:
   azure-terraform-job:
     name: 'Packer Build'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment: tst
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
