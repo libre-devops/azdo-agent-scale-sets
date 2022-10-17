@@ -16,7 +16,7 @@ echo -en "\n" | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Hom
     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc && \
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
     source "/home/${USER}/.bash_profile" && source "/home/${USER}/.bashrc" && \
-    brew install gcc python3 packer terraform && pip3 install ansible-core azure-cli
+    brew install gcc python3 packer terraform && pip3 install ansible azure-cli
 
 # Install Microsoft repository
 wget https://packages.microsoft.com/config/ubuntu/$LSB_RELEASE/packages-microsoft-prod.deb
