@@ -193,12 +193,18 @@ stages:
               --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
               --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
               -o tsv \
-              --query [].id)
+              --query "[].{Name:name, ResourceGroup:resourceGroup}")
 
-              for ImageId in $ImageIds
+              for ImageVersion in $ImageVersions
               do
-                echo "Deleting image version: $ImageId"
-                az sig image-version delete --ids $ImageId --yes
+                ResourceGroup=$(echo $ImageVersion | awk -F'\t' '{print $1}')
+                VersionName=$(echo $ImageVersion | awk -F'\t' '{print $2}')
+                echo "Deleting image version: $VersionName"
+                az sig image-version delete \
+                --resource-group $ResourceGroup \
+                --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
+                --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
+                --gallery-image-version $VersionName --yes
               done
 
               ImageResourceIds=$(az resource list \
@@ -206,14 +212,13 @@ stages:
               --resource-type Microsoft.Compute/images \
               -o tsv \
               --query [].id)
-
+          
               for ImageResourceId in $ImageResourceIds
               do
                 echo "Deleting image resource: $ImageResourceId"
                 az resource delete --ids $ImageResourceId --yes
               done
             displayName: "Delete all gallery image versions and image resources"
-
 
 
   - stage: "${{ parameters.SHORTHAND_ENVIRONMENT_NAME }}_PreReq"
