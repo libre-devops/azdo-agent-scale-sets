@@ -23,7 +23,7 @@ module "network" {
 # Create a NSG with an explict deny at 4096, since this environment needs 5 NSGs, count is set to 5
 module "nsg" {
   source   = "registry.terraform.io/libre-devops/nsg/azurerm"
-  count    = 5
+  count    = 1
   rg_name  = module.rg.rg_name
   location = module.rg.rg_location
   tags     = module.rg.rg_tags
@@ -33,7 +33,7 @@ module "nsg" {
 }
 
 resource "azurerm_network_security_rule" "vnet_inbound" {
-  count = 5 # can't use length() of subnet ids as not known till apply
+  count = 1 # can't use length() of subnet ids as not known till apply
 
   name                        = "AllowVnetInbound"
   priority                    = "149"
