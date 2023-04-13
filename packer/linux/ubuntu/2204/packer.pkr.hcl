@@ -18,7 +18,7 @@ variable "image_os" {
 
 variable "image_version" {
   type        = string
-  default     = "dev"
+  default     = "uat"
   description = "Used in scripts"
 }
 
@@ -36,7 +36,7 @@ variable "installer_script_folder" {
 
 variable "location" {
   type        = string
-  default     = "UK South"
+  default     = "West Europe"
   description = "Used in scripts"
 }
 
@@ -44,14 +44,14 @@ variable "location" {
 variable "client_id" {
   type        = string
   description = "The client id, passed as a PKR_VAR"
-  default     = env("PKR_VAR_client_id")
+  default     = env("ARM_CLIENT_ID")
 }
 
 variable "client_secret" {
   type        = string
   sensitive   = true
   description = "The client_secret, passed as a PKR_VAR"
-  default     = env("PKR_VAR_client_secret")
+  default     = env("ARM_CLIENT_SECRET")
 }
 
 variable "dockerhub_login" {
@@ -70,48 +70,48 @@ variable "dockerhub_password" {
 variable "subscription_id" {
   type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
-  default     = env("PKR_VAR_subscription_id")
+  default     = env("ARM_SUBSCRIPTION_ID")
 }
 
 variable "tenant_id" {
   type        = string
   description = "The gallery resource group name, passed as a PKR_VAR"
-  default     = env("PKR_VAR_tenant_id")
+  default     = env("ARM_TENANT_ID")
 }
 
 variable "gallery_name" {
   type        = string
-  default     = "galldoeuwdev01"
+  default     = "galldoeuwuat01"
   description = "The wgallery name"
 }
 
 variable "gallery_rg_name" {
   type        = string
-  default     = "rg-ldo-euw-dev-build"
+  default     = "rg-ldo-euw-uat-sgdo"
   description = "The gallery resource group name"
 }
 
 variable "virtual_network_name" {
   type        = string
-  default     = "vnet-ldo-euw-dev-01"
+  default     = "vnet-ldo-euw-uat-01"
   description = "The name of the vnet"
 }
 
 variable "virtual_network_resource_group_name" {
   type        = string
-  default     = "rg-ldo-euw-dev-build"
+  default     = "rg-ldo-euw-uat-sgnet"
   description = "The name of the resource group the vnet is in"
 }
 
 variable "virtual_network_subnet_name" {
   type        = string
-  default     = "sn1-vnet-ldo-euw-dev-01"
-  description = "The subnet the VM should be oput in"
+  default     = "sn1-vnet-ldo-euw-uat-01"
+  description = "The subnet the VM should be put in"
 }
 
 variable "private_virtual_network_with_public_ip" {
   type        = bool
-  default     = false
+  default     = true
   description = "Determines whether packer should attempt public IP communication"
 }
 
@@ -132,7 +132,7 @@ source "azure-arm" "build" {
   image_publisher         = "Canonical"
   image_offer             = "0001-com-ubuntu-server-jammy"
   image_sku               = "22_04-lts"
-  vm_size                 = "Standard_D4s_v4"
+  vm_size                 = "Standard_B4ms"
   temporary_key_pair_type = "ed25519"
 
   virtual_network_name                   = var.virtual_network_name
@@ -152,7 +152,7 @@ source "azure-arm" "build" {
     resource_group = var.gallery_rg_name
     subscription   = var.subscription_id
     replication_regions = [
-      "westeurope"
+      "northeurope"
     ]
   }
 }

@@ -8,7 +8,7 @@ jobs:
   azure-terraform-job:
     name: 'Packer Build'
     runs-on: self-hosted
-    environment: tst
+    environment: uat
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
