@@ -187,12 +187,6 @@ stages:
 
           - bash: |
               az login --service-principal -u $(SpokeSvpClientId) -p $(SpokeSvpClientSecret) --tenant $(SpokeTenantId) && \
-              ImageIds=$(az sig image-version list \
-              --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
-              --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
-              --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
-              -o tsv \
-              --query "[].storageProfile.osDiskImage.source.id")
               
               ImageVersionNumber=$(az sig image-version list \
               --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
@@ -210,10 +204,9 @@ stages:
               --gallery-image-version ${sigImage}
               done
               
-              for image in $ImageIds
-              do
-              az image delete --ids ${image}
-              done
+              az image delete \
+              --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
+              --name ${{ parameters.IMAGE_DEFINITION_NAME }}
             displayName: "Delete all gallery image versions and image resources"
 
 
