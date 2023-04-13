@@ -171,14 +171,14 @@ stages:
 
   - stage: "${{ parameters.SHORTHAND_ENVIRONMENT_NAME }}_DeleteImage"
     dependsOn: "${{ parameters.SHORTHAND_ENVIRONMENT_NAME }}_ScaleSets"
-    displayName: "${{ parameters.SHORTHAND_ENVIRONMENT_NAME }} PreReq Stage"
+    displayName: "${{ parameters.SHORTHAND_ENVIRONMENT_NAME }} Delete Images Stage"
     jobs:
       - job: Terraform_Build
         workspace:
           clean: all
         pool:
           vmImage: 'ubuntu-latest'
-        displayName: Terraform Build
+        displayName: Delete Images
         steps:
 
           # Declare the repos needed from the resources list
