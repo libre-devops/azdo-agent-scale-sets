@@ -99,7 +99,7 @@ variable "virtual_network_name" {
 
 variable "virtual_network_resource_group_name" {
   type        = string
-  default     = "rg-ldo-euw-uat-sgnet"
+  default     = "rg-ldo-euw-uat-build"
   description = "The name of the resource group the vnet is in"
 }
 
