@@ -49,7 +49,7 @@ resource "azurerm_network_security_rule" "vnet_inbound" {
 }
 
 resource "azurerm_network_security_rule" "bastion_inbound" {
-  count = 5 # can't use length() of subnet ids as not known till apply
+  count = 1 # can't use length() of subnet ids as not known till apply
 
   name                        = "AllowSSHRDPInbound"
   priority                    = "150"
