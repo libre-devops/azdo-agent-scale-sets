@@ -192,19 +192,18 @@ stages:
               --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
               --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
               --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
-              -o tsv \
+              -o json \
               --query "[].{Name:name, ResourceGroup:resourceGroup}")
 
-              for ImageVersion in $ImageVersions
+              for ImageVersion in $(echo "$ImageVersions" | jq -c '.[]')
               do
-                ResourceGroup=$(echo $ImageVersion | awk -F'\t' '{print $1}')
-                VersionName=$(echo $ImageVersion | awk -F'\t' '{print $2}')
+                ResourceGroup=$(echo $ImageVersion | jq -r '.ResourceGroup')
+                VersionName=$(echo $ImageVersion | jq -r '.Name')
                 echo "Deleting image version: $VersionName"
-                az sig image-version delete \
-                --resource-group $ResourceGroup \
-                --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
-                --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
-                --gallery-image-version $VersionName
+                az sig image-version delete --resource-group $ResourceGroup \
+              --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
+              --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
+              --gallery-image-version $VersionName
               done
 
               ImageResourceIds=$(az resource list \
