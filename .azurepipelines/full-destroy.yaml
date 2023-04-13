@@ -186,7 +186,7 @@ stages:
           - checkout: azure-naming-convention
 
           - bash: |
-              set -e
+              set -x
               az login --service-principal -u $(SpokeSvpClientId) -p $(SpokeSvpClientSecret) --tenant $(SpokeTenantId) && \
               ImageIds=$(az sig image-version list \
               --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
