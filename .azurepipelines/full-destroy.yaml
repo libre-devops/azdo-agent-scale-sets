@@ -152,7 +152,7 @@ stages:
               SHORTHAND_PROJECT_NAME: ${{ parameters.SHORTHAND_PROJECT_NAME }} # Parameters entered in YAML
               SHORTHAND_ENVIRONMENT_NAME: ${{ parameters.SHORTHAND_ENVIRONMENT_NAME }}
               SHORTHAND_LOCATION_NAME: ${{ parameters.SHORTHAND_LOCATION_NAME }}
-              TERRAFORM_PATH: "${{ parameters.TERRAFORM_PATH }}/1-scale-sets"
+              TERRAFORM_PATH: "${{ parameters.TERRAFORM_PATH }}/1-scale-set"
               TERRAFORM_VERSION: ${{ parameters.TERRAFORM_VERSION }}
               TERRAFORM_DESTROY: ${{ parameters.TERRAFORM_DESTROY }}
               TERRAFORM_PLAN_ONLY: ${{ parameters.TERRAFORM_PLAN_ONLY }}

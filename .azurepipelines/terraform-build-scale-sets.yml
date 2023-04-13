@@ -31,7 +31,7 @@ parameters:
 
   - name: TERRAFORM_PATH
     type: string
-    default: "azdo-agent-scale-sets/terraform/1-scale-sets"
+    default: "azdo-agent-scale-sets/terraform/1-scale-set"
     displayName: "What is the path to your terraform code?"
 
   - name: TERRAFORM_VERSION
