@@ -87,7 +87,7 @@ variable "gallery_name" {
 
 variable "gallery_rg_name" {
   type        = string
-  default     = "rg-ldo-euw-uat-sgdo"
+  default     = "rg-ldo-euw-uat-build"
   description = "The gallery resource group name"
 }
 
