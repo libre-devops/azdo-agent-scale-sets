@@ -186,14 +186,30 @@ stages:
           - checkout: azure-naming-convention
 
           - bash: |
-              set -x
               az login --service-principal -u $(SpokeSvpClientId) -p $(SpokeSvpClientSecret) --tenant $(SpokeTenantId) && \
               ImageIds=$(az sig image-version list \
               --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
               --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
               --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
               -o tsv \
-              --query "[].id")
+              --query "[].storageProfile.osDiskImage.source.id")
+              
+              ImageVersionNumber=$(az sig image-version list \
+              --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
+              --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
+              --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
+              -o tsv \
+              --query "[].name")
+              
+              for sigImage in $ImageVersionNumber
+              do
+              az sig image-version delete \
+              --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
+              --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
+              --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
+              --gallery-image-version ${sigImage}
+              done
+              
               for image in $ImageIds
               do
               az image delete --ids ${image}
