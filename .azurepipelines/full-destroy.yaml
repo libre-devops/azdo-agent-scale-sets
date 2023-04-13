@@ -204,7 +204,7 @@ stages:
                 --resource-group $ResourceGroup \
                 --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
                 --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
-                --gallery-image-version $VersionName --yes
+                --gallery-image-version $VersionName
               done
 
               ImageResourceIds=$(az resource list \
