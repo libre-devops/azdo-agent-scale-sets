@@ -192,30 +192,11 @@ stages:
               --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
               --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
               --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
-              -o json \
-              --query "[].{Name:name, ResourceGroup:resourceGroup}")
-
-              for ImageVersion in $(echo "$ImageVersions" | jq -c '.[]')
-              do
-                ResourceGroup=$(echo $ImageVersion | jq -r '.ResourceGroup')
-                VersionName=$(echo $ImageVersion | jq -r '.Name')
-                echo "Deleting image version: $VersionName"
-                az sig image-version delete --resource-group $ResourceGroup \
-              --gallery-name ${{ parameters.IMAGE_GALLERY_NAME }} \
-              --gallery-image-definition ${{ parameters.IMAGE_DEFINITION_NAME }} \
-              --gallery-image-version $VersionName
-              done
-
-              ImageResourceIds=$(az resource list \
-              --resource-group ${{ parameters.IMAGE_GALLERY_RG_NAME }} \
-              --resource-type Microsoft.Compute/images \
               -o tsv \
-              --query [].id)
-          
-              for ImageResourceId in $ImageResourceIds
+              --query "[].id")
+              for image in $ImageIds
               do
-                echo "Deleting image resource: $ImageResourceId"
-                az resource delete --ids $ImageResourceId --yes
+              az image delete --ids ${image}
               done
             displayName: "Delete all gallery image versions and image resources"
 
