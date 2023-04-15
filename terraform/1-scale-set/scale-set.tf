@@ -12,6 +12,7 @@ module "linux_scale_set" {
   asg_name         = "asg-vmss${var.short}${var.loc}${terraform.workspace}-${var.short}-${var.loc}-${terraform.workspace}-01"
   admin_username   = "LibreDevOpsAdmin"
 
+
   settings = {
     "vmss${var.short}${var.loc}${terraform.workspace}01" = {
 
@@ -20,6 +21,7 @@ module "linux_scale_set" {
       instances                       = 0
       overprovision                   = false
       zones                           = ["1", "2"]
+      upgrade_mode                    = "Rolling"
       provision_vm_agent              = true
 
       source_image_id = data.azurerm_shared_image.shared_image.id
