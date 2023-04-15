@@ -21,10 +21,16 @@ module "linux_scale_set" {
       instances                       = 0
       overprovision                   = false
       zones                           = ["1", "2"]
-      upgrade_mode                    = "Automatic"
+      upgrade_mode                    = "Rolling"
       provision_vm_agent              = true
 
       source_image_id = data.azurerm_shared_image.shared_image.id
+
+      rolling_upgrade_policy = {
+        max_batch_instance_percent              = "50"
+        max_unhealthy_instance_percent          = "25"
+        max_unhealthy_upgraded_instance_percent = "25"
+      }
 
       os_disk = {
         storage_account_type = "StandardSSD_LRS"
