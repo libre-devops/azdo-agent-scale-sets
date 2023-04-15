@@ -21,7 +21,7 @@ module "linux_scale_set" {
       instances                       = 0
       overprovision                   = false
       zones                           = ["1", "2"]
-      upgrade_mode                    = "Rolling"
+      upgrade_mode                    = "Automatic"
       provision_vm_agent              = true
 
       source_image_id = data.azurerm_shared_image.shared_image.id
