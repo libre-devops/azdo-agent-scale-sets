@@ -17,7 +17,7 @@ module "linux_scale_set" {
 
       sku                             = "Standard_B4ms"
       disable_password_authentication = true
-      instances                       = 1
+      instances                       = 0
       overprovision                   = false
       zones                           = ["1", "2"]
       provision_vm_agent              = true
@@ -25,7 +25,7 @@ module "linux_scale_set" {
       source_image_id = data.azurerm_shared_image.shared_image.id
 
       os_disk = {
-        storage_account_type = "Standard_LRS"
+        storage_account_type = "StandardSSD_LRS"
         disk_size_gb         = "127"
       }
 
@@ -39,6 +39,11 @@ module "linux_scale_set" {
 
       admin_ssh_key = {
         public_key = data.azurerm_ssh_public_key.mgmt_ssh_key.public_key
+      }
+
+      automatic_os_upgrade_policy = {
+        disable_automatic_rollback  = false
+        enable_automatic_os_upgrade = true
       }
     }
   }
