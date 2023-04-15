@@ -30,6 +30,7 @@ module "linux_scale_set" {
         max_batch_instance_percent              = "50"
         max_unhealthy_instance_percent          = "25"
         max_unhealthy_upgraded_instance_percent = "25"
+        pause_time_between_batches              = "PT1H"
       }
 
       os_disk = {
