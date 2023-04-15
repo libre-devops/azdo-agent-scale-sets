@@ -26,12 +26,12 @@ data "external" "agent_pool" {
   program = ["python3", "create_pool.py"]
 
   query = {
-    url           = var.azdo_url
-    pat_token     = var.azdo_pat
+    url             = var.azdo_url
+    pat_token       = var.azdo_pat
     agent_pool_name = var.azdo_agent_pool_name != null ? var.azdo_agent_pool_name : local.agent_pool_name
   }
 }
 
 locals {
-  agent_pool_id   = data.external.agent_pool.result["agent_pool_id"]
+  agent_pool_id = data.external.agent_pool.result["agent_pool_id"]
 }

@@ -39,10 +39,10 @@ module "linux_scale_set" {
       }
 
       extension = {
-          name                 = "AzurePipelinesAgent"
-          publisher            = "Microsoft.VisualStudio.Services.AzureDevOpsAgent"
-          type                 = "AzureDevOpsAgent"
-          type_handler_version = "1.0"
+        name                 = "AzurePipelinesAgent"
+        publisher            = "Microsoft.VisualStudio.Services.AzureDevOpsAgent"
+        type                 = "AzureDevOpsAgent"
+        type_handler_version = "1.0"
 
         settings = jsonencode({
           VSTSAccount = var.azdo_url
