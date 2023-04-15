@@ -41,11 +41,6 @@ module "linux_scale_set" {
       admin_ssh_key = {
         public_key = data.azurerm_ssh_public_key.mgmt_ssh_key.public_key
       }
-
-      automatic_os_upgrade_policy = {
-        disable_automatic_rollback  = false
-        enable_automatic_os_upgrade = true
-      }
     }
   }
 }
