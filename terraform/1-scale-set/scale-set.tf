@@ -39,9 +39,9 @@ module "linux_scale_set" {
       }
 
       extension = {
-        name                 = "AzurePipelinesAgent"
-        publisher            = "Microsoft.VisualStudio.Services.AzureDevOpsAgent"
-        type                 = "AzureDevOpsAgent"
+        name                 = "Microsoft.Azure.DevOps.Pipelines.Agent"
+        publisher            = "Microsoft.VisualStudio.Services"
+        type                 = "TeamServicesAgentLinux"
         type_handler_version = "1.0"
 
         settings = jsonencode({
@@ -62,4 +62,3 @@ module "linux_scale_set" {
     }
   }
 }
-

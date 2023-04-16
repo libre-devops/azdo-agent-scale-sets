@@ -24,9 +24,13 @@ def create_agent_pool(
     payload = {
         "name": agent_pool_name,
         "poolType": "automation",
+        "autoProvision": True,
         "autoSize": True,
+        "isHosted": False,
         "options": "elasticPool",
     }
+
+
     response = requests.post(
         create_agent_pool_url, headers=headers, auth=auth, json=payload, timeout=5
     )
