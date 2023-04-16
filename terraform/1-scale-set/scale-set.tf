@@ -38,24 +38,6 @@ module "linux_scale_set" {
         }
       }
 
-      extension = {
-        name                 = "Microsoft.Azure.DevOps.Pipelines.Agent"
-        publisher            = "Microsoft.VisualStudio.Services"
-        type                 = "TeamServicesAgentLinux"
-        type_handler_version = "1.0"
-
-        settings = jsonencode({
-          VSTSAccount = var.azdo_url
-          TeamProject = var.azdo_project
-          PoolId      = local.agent_pool_id
-          AgentName   = random_string.random_suffix.result
-        })
-
-        protected_settings = jsonencode({
-          PATToken = var.azdo_pat
-        })
-      }
-
       admin_ssh_key = {
         public_key = data.azurerm_ssh_public_key.mgmt_ssh_key.public_key
       }
