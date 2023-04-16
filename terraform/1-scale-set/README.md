@@ -36,10 +36,6 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_Regions"></a> [Regions](#input\_Regions) | Converts shorthand name to longhand name via lookup on map list | `map(string)` | <pre>{<br>  "eus": "East US",<br>  "euw": "West Europe",<br>  "uks": "UK South",<br>  "ukw": "UK West"<br>}</pre> | no |
-| <a name="input_azdo_agent_pool_name"></a> [azdo\_agent\_pool\_name](#input\_azdo\_agent\_pool\_name) | The name of the agent pool if you want one specified | `string` | `null` | no |
-| <a name="input_azdo_pat"></a> [azdo\_pat](#input\_azdo\_pat) | The PAT token for Azure DevOps access | `string` | n/a | yes |
-| <a name="input_azdo_project"></a> [azdo\_project](#input\_azdo\_project) | The project name of the Azure DevOps repo | `string` | n/a | yes |
-| <a name="input_azdo_url"></a> [azdo\_url](#input\_azdo\_url) | The URL of Azure DevOps instance | `string` | n/a | yes |
 | <a name="input_env"></a> [env](#input\_env) | This is passed as an environment variable, it is for the shorthand environment tag for resource.  For example, production = prod | `string` | `"dev"` | no |
 | <a name="input_loc"></a> [loc](#input\_loc) | The shorthand name of the Azure location, for example, for UK South, use uks.  For UK West, use ukw. Normally passed as TF\_VAR in pipeline | `string` | `"euw"` | no |
 | <a name="input_short"></a> [short](#input\_short) | This is passed as an environment variable, it is for a shorthand name for the environment, for example hello-world = hw | `string` | `"ldo"` | no |
