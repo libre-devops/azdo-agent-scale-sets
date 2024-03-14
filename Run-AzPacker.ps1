@@ -349,7 +349,11 @@ try
     $ConvertedAttemptAzLogin = Convert-ToBoolean $AttemptAzLogin
     if ($ConvertedAttemptAzLogin)
     {
-        Connect-AzAccountWithServicePrincipal -ApplicationId $env:PKR_VAR_ARM_CLIENT_ID -TenantId $Env:PKR_VAR_ARM_TENANT_ID -Secret $Env:PKR_VAR_ARM_CLIENT_SECRET -SubscriptionId $Env:PKR_VAR_ARM_SUBSCRIPTION_ID
+        Connect-AzAccountWithServicePrincipal `
+        -ApplicationId $Env:PKR_VAR_ARM_CLIENT_ID `
+        -TenantId $Env:PKR_VAR_ARM_TENANT_ID `
+        -Secret $Env:PKR_VAR_ARM_CLIENT_SECRET `
+        -SubscriptionId $Env:PKR_VAR_ARM_SUBSCRIPTION_ID
     }
 
     if ($null -ne $NsgResourceId)
@@ -362,16 +366,17 @@ try
         # Retrieve the NSG object
         $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
 
-        Manage-CurrentIPInNsg -Nsg $nsg `
-                              -AddRule $ConvertedAddCurrentClientToNsg `
-                              -RuleName $RuleName `
-                              -Priority $Priority `
-                              -Direction $Direction `
-                              -Access $Access `
-                              -Protocol $Protocol `
-                              -SourcePortRange $SourcePortRange `
-                              -DestinationPortRange $DestinationPortRange `
-                              -DestinationAddressPrefix $DestinationAddressPrefix
+        Manage-CurrentIPInNsg `
+        -Nsg $nsg `
+        -AddRule $ConvertedAddCurrentClientToNsg `
+        -RuleName $RuleName `
+        -Priority $Priority `
+        -Direction $Direction `
+        -Access $Access `
+        -Protocol $Protocol `
+        -SourcePortRange $SourcePortRange `
+        -DestinationPortRange $DestinationPortRange `
+        -DestinationAddressPrefix $DestinationAddressPrefix
     }
     else
     {
@@ -439,16 +444,17 @@ finally
 
         # Retrieve the NSG object
         $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
-        Manage-CurrentIPInNsg -Nsg $nsg `
-                              -AddRule $false `
-                              -RuleName $RuleName `
-                              -Priority $Priority `
-                              -Direction $Direction `
-                              -Access $Access `
-                              -Protocol $Protocol `
-                              -SourcePortRange $SourcePortRange `
-                              -DestinationPortRange $DestinationPortRange `
-                              -DestinationAddressPrefix $DestinationAddressPrefix
+        Manage-CurrentIPInNsg `
+        -Nsg $nsg `
+        -AddRule $false `
+        -RuleName $RuleName `
+        -Priority $Priority `
+        -Direction $Direction `
+        -Access $Access `
+        -Protocol $Protocol `
+        -SourcePortRange $SourcePortRange `
+        -DestinationPortRange $DestinationPortRange `
+        -DestinationAddressPrefix $DestinationAddressPrefix
     }
     else
     {
