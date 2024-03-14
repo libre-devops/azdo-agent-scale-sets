@@ -234,7 +234,7 @@ function Manage-CurrentIPInNsg
         }
 
         # Applying changes to the NSG
-        Set-AzNetworkSecurityGroup -NetworkSecurityGroup $Nsg
+        Set-AzNetworkSecurityGroup -NetworkSecurityGroup $Nsg | Out-Null
         Write-Host "[$( $MyInvocation.MyCommand.Name )] NSG has been updated successfully." -ForegroundColor Green
     }
     catch
