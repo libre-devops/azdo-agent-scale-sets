@@ -60,38 +60,24 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install packer
-        id: install-packer
+      - name: Install pkenv
+        id: install-pkenv
         shell: pwsh
         run: |
-          # Define the target directory for the Packer binary
-          $targetDirectory = "/usr/local/bin"
-          # Ensure the target directory exists
-          if (-not (Test-Path -Path $targetDirectory -PathType Container)) {
-              New-Item -ItemType Directory -Path $targetDirectory -Force
-          }
+          brew tap kwilczynski/homebrew-pkenv
+          brew install pkenv
+          $PackerJsonUrl = "https://api.releases.hashicorp.com/v1/releases/packer"
+          $JsonContent = Invoke-RestMethod -Uri $PackerJsonUrl 
+          
+          # Filter out pre-releases and sort by version number
+          $LatestVersion = $JsonContent | Where-Object { $_.is_prerelease -eq $false } | Sort-Object { [Version] $_.version } -Descending | Select-Object -First 1
+          
+          # Output the latest version number
+          $PackerLatestVersion = $LatestVersion.version
 
-          # Get the latest Packer version URL from HashiCorp releases
-          $packerReleases = Invoke-RestMethod -Uri "https://releases.hashicorp.com/packer/index.json"
-          $latestPackerUrl = $packerReleases.versions.PSObject.Properties.Value.builds.url |
-                             Where-Object { $_ -match "linux.*amd64" -and $_ -notmatch "rc|beta|alpha" } |
-                             Select-Object -Last 1
-
-          # Extract the version from the URL
-          $latestVersion = $latestPackerUrl -split '/' | Where-Object { $_ -match "packer_" } |
-                           ForEach-Object { $_ -replace 'packer_', '' -replace '_linux_amd64.zip', '' }
-
-          # Download the latest Packer binary
-          $downloadPath = "$env:TEMP/packer_${latestVersion}_linux_amd64.zip"
-          Invoke-WebRequest -Uri $latestPackerUrl -OutFile $downloadPath
-
-          # Extract the binary to the target directory
-          Expand-Archive -Path $downloadPath -DestinationPath $targetDirectory -Force
-
-          # Optionally, clean up the downloaded ZIP file
-          Remove-Item -Path $downloadPath
-
-          Write-Host "Packer version $latestVersion has been installed to $targetDirectory"
+          # Use pkenv to install and use the latest Packer version
+          pkenv install $PackerLatestVersion
+          pkenv use $PackerLatestVersion
 
       - name: Install PowerShell modules
         id: install-powershell-modules
