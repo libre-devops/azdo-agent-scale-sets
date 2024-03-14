@@ -77,7 +77,7 @@ jobs:
         shell: pwsh
         run: |
           
-          .\Run-Packer.ps1 `
+          .\Run-AzPacker.ps1 `
             -WorkingDirectory ${{ inputs.packer_code_location }} `
             -RunPackerInit ${{ inputs.run_packer_init }} `
             -RunPackerValidate ${{ inputs.run_packer_validate }} `
