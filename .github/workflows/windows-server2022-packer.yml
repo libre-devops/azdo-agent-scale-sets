@@ -80,7 +80,7 @@ jobs:
           .\Run-Packer.ps1 `
             -WorkingDirectory ${{ inputs.packer_code_location }} `
             -RunPackerInit ${{ inputs.run_packer_init }} `
-            -RunPackerValidate ${{ inputs.packer_code_validate }} `
+            -RunPackerValidate ${{ inputs.run_packer_validate }} `
             -AddCurrentClientToNsg ${{ inputs.add_client_to_nsg }} `
             -NsgResourceId ${{ vars.nsgid }}
         env:
