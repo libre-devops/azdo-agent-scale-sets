@@ -364,7 +364,7 @@ try
         $nsgName = $resourceIdParts[-1]
 
         # Retrieve the NSG object
-        $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName | Out-Null
+        $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
 
         Manage-CurrentIPInNsg `
         -Nsg $nsg `
@@ -443,7 +443,7 @@ finally
         $nsgName = $resourceIdParts[-1]
 
         # Retrieve the NSG object
-        $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName | Out-Null
+        $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
         Manage-CurrentIPInNsg `
         -Nsg $nsg `
         -AddRule $false `
