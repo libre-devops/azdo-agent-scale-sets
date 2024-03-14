@@ -60,27 +60,34 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install pkenv
-        id: install-pkenv
+      - name: Install packer
+        id: install-packer
         shell: pwsh
         run: |
           brew tap kwilczynski/homebrew-pkenv
-          brew install pkenv
-          # Fetch the latest Packer URL excluding rc, beta, and alpha versions for linux amd64
-          $PackerJsonUrl = "https://releases.hashicorp.com/packer/index.json"
-          $JsonContent = Invoke-RestMethod -Uri $PackerJsonUrl
-          $PackerLatestUrl = $JsonContent.versions.PSObject.Properties.Value.builds | 
-              Where-Object { $_.url -match 'linux.*amd64' -and $_.url -notmatch 'rc|beta|alpha' } | 
-              Select-Object -ExpandProperty url -Last 1
-          
-          # Extract the Packer latest version from the URL
-          $PackerLatestVersion = $PackerLatestUrl -split '/' | Where-Object { $_ -match 'packer_' } | 
-              ForEach-Object { $_ -replace 'packer_', '' } | 
-              ForEach-Object { $_ -replace '_linux_amd64.zip', '' }
-          
-          # Use pkenv to install and use the latest Packer version
-          pkenv install $PackerLatestVersion
-          pkenv use $PackerLatestVersion
+          brew install packer
+
+#      - name: Install pkenv
+#        id: install-pkenv
+#        shell: pwsh
+#        run: |
+#          brew tap kwilczynski/homebrew-pkenv
+#          brew install pkenv
+#          # Fetch the latest Packer URL excluding rc, beta, and alpha versions for linux amd64
+#          $PackerJsonUrl = "https://releases.hashicorp.com/packer/index.json"
+#          $JsonContent = Invoke-RestMethod -Uri $PackerJsonUrl
+#          $PackerLatestUrl = $JsonContent.versions.PSObject.Properties.Value.builds |
+#              Where-Object { $_.url -match 'linux.*amd64' -and $_.url -notmatch 'rc|beta|alpha' } |
+#              Select-Object -ExpandProperty url -Last 1
+#
+#          # Extract the Packer latest version from the URL
+#          $PackerLatestVersion = $PackerLatestUrl -split '/' | Where-Object { $_ -match 'packer_' } |
+#              ForEach-Object { $_ -replace 'packer_', '' } |
+#              ForEach-Object { $_ -replace '_linux_amd64.zip', '' }
+#
+#          # Use pkenv to install and use the latest Packer version
+#          pkenv install $PackerLatestVersion
+#          pkenv use $PackerLatestVersion
 
 
       - name: Install PowerShell modules
