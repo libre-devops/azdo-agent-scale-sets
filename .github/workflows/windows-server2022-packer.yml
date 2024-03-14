@@ -64,31 +64,34 @@ jobs:
         id: install-packer
         shell: pwsh
         run: |
-          brew tap kwilczynski/homebrew-pkenv
-          brew install packer
+          # Define the target directory for the Packer binary
+          $targetDirectory = "/usr/local/bin"
+          # Ensure the target directory exists
+          if (-not (Test-Path -Path $targetDirectory -PathType Container)) {
+              New-Item -ItemType Directory -Path $targetDirectory -Force
+          }
 
-#      - name: Install pkenv
-#        id: install-pkenv
-#        shell: pwsh
-#        run: |
-#          brew tap kwilczynski/homebrew-pkenv
-#          brew install pkenv
-#          # Fetch the latest Packer URL excluding rc, beta, and alpha versions for linux amd64
-#          $PackerJsonUrl = "https://releases.hashicorp.com/packer/index.json"
-#          $JsonContent = Invoke-RestMethod -Uri $PackerJsonUrl
-#          $PackerLatestUrl = $JsonContent.versions.PSObject.Properties.Value.builds |
-#              Where-Object { $_.url -match 'linux.*amd64' -and $_.url -notmatch 'rc|beta|alpha' } |
-#              Select-Object -ExpandProperty url -Last 1
-#
-#          # Extract the Packer latest version from the URL
-#          $PackerLatestVersion = $PackerLatestUrl -split '/' | Where-Object { $_ -match 'packer_' } |
-#              ForEach-Object { $_ -replace 'packer_', '' } |
-#              ForEach-Object { $_ -replace '_linux_amd64.zip', '' }
-#
-#          # Use pkenv to install and use the latest Packer version
-#          pkenv install $PackerLatestVersion
-#          pkenv use $PackerLatestVersion
+          # Get the latest Packer version URL from HashiCorp releases
+          $packerReleases = Invoke-RestMethod -Uri "https://releases.hashicorp.com/packer/index.json"
+          $latestPackerUrl = $packerReleases.versions.PSObject.Properties.Value.builds.url |
+                             Where-Object { $_ -match "linux.*amd64" -and $_ -notmatch "rc|beta|alpha" } |
+                             Select-Object -Last 1
 
+          # Extract the version from the URL
+          $latestVersion = $latestPackerUrl -split '/' | Where-Object { $_ -match "packer_" } |
+                           ForEach-Object { $_ -replace 'packer_', '' -replace '_linux_amd64.zip', '' }
+
+          # Download the latest Packer binary
+          $downloadPath = "$env:TEMP/packer_${latestVersion}_linux_amd64.zip"
+          Invoke-WebRequest -Uri $latestPackerUrl -OutFile $downloadPath
+
+          # Extract the binary to the target directory
+          Expand-Archive -Path $downloadPath -DestinationPath $targetDirectory -Force
+
+          # Optionally, clean up the downloaded ZIP file
+          Remove-Item -Path $downloadPath
+
+          Write-Host "Packer version $latestVersion has been installed to $targetDirectory"
 
       - name: Install PowerShell modules
         id: install-powershell-modules
