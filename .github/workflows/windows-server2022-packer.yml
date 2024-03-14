@@ -28,7 +28,7 @@ on:
         type: string
         description: 'Packer file name'
         default: 'packer.pkr.hcl'
-      attempt_login_for_nsg:
+      attempt_az_login:
         type: boolean
         description: 'Whether to attempt logging into Azure to edit your nsg'
         default: true
