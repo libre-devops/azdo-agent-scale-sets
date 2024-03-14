@@ -313,6 +313,7 @@ function Run-PackerBuild
 
 try
 {
+    $ConvertedAddCurrentClientToNsg = Convert-ToBoolean $AddCurrentClientToNsg
     if ($null -ne $NsgResourceId)
     {
         # Extract Resource Group Name and NSG Name from the Resource ID
@@ -324,7 +325,7 @@ try
         $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
 
         Manage-CurrentIPInNsg -Nsg $nsg `
-                              -AddRule $AddCurrentClientToNsg `
+                              -AddRule $ConvertedAddCurrentClientToNsg `
                               -RuleName $RuleName `
                               -Priority $Priority `
                               -Direction $Direction `
