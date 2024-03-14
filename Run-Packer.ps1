@@ -8,7 +8,7 @@ param (
     [string]$WorkingDirectory = (Get-Location).Path,
     [string]$PackerVersion = "default",
     [string]$NsgResourceId = $null,
-    [bool]$AddCurrentClientToNsg = $true,
+    [string]$AddCurrentClientToNsg = "true",
     [string]$RuleName = "TemporaryAllowCurrentClientIP",
     [int]$Priority = 105,
     [string]$Direction = "Inbound",
