@@ -9,6 +9,7 @@ param (
     [string]$PackerVersion = "default",
     [string]$NsgResourceId = $null,
     [string]$AddCurrentClientToNsg = "true",
+    [string]$AttemptLoginForNsg = "true",
     [string]$RuleName = "TemporaryAllowCurrentClientIP",
     [int]$Priority = 105,
     [string]$Direction = "Inbound",
@@ -139,6 +140,7 @@ function Manage-CurrentIPInNsg
     param (
         [Microsoft.Azure.Commands.Network.Models.PSNetworkSecurityGroup]$Nsg,
         [bool]$AddRule,
+        [bool]$AttemptLoginForNsg = $true,
         [string]$RuleName,
         [int]$Priority,
         [string]$Direction,
@@ -149,8 +151,41 @@ function Manage-CurrentIPInNsg
         [string]$DestinationAddressPrefix
     )
 
+    function Connect-AzAccountWithServicePrincipal
+    {
+        param (
+            [string]$ApplicationId,
+            [string]$TenantId,
+            [string]$Secret,
+            [string]$SubscriptionId
+        )
+
+        try
+        {
+            $SecureSecret = $Secret | ConvertTo-SecureString -AsPlainText -Force
+            $Credential = New-Object System.Management.Automation.PSCredential ($ApplicationId, $SecureSecret)
+            Connect-AzAccount -ServicePrincipal -Credential $Credential -Tenant $TenantId -ErrorAction Stop
+
+            if (-not [string]::IsNullOrEmpty($SubscriptionId))
+            {
+                Set-AzContext -SubscriptionId $SubscriptionId
+            }
+
+            Write-Host "Successfully logged in to Azure." -ForegroundColor Cyan
+        }
+        catch
+        {
+            Write-Error "Failed to log in to Azure with the provided service principal details: $_"
+            throw $_
+        }
+    }
+
     try
     {
+        if ($AttemptLoginForNsg)
+        {
+            Connect-AzAccountWithServicePrincipal -ApplicationId $env:PKR_VAR_ARM_CLIENT_ID -TenantId $Env:PKR_VAR_ARM_TENANT_ID -Secret $Env:PKR_VAR_ARM_CLIENT_SECRET -SubscriptionId $Env:PKR_VAR_ARM_SUBSCRIPTION_ID
+        }
         if ($AddRule)
         {
             $currentIp = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com").Trim()
@@ -314,6 +349,8 @@ function Run-PackerBuild
 try
 {
     $ConvertedAddCurrentClientToNsg = Convert-ToBoolean $AddCurrentClientToNsg
+    $ConvertedAttemptLoginForNsg = Convert-ToBoolean $AttemptLoginForNsg
+
     if ($null -ne $NsgResourceId)
     {
         # Extract Resource Group Name and NSG Name from the Resource ID
@@ -325,6 +362,7 @@ try
         $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
 
         Manage-CurrentIPInNsg -Nsg $nsg `
+                              -AttemptLoginForNsg $ConvertedAttemptLoginForNsg `
                               -AddRule $ConvertedAddCurrentClientToNsg `
                               -RuleName $RuleName `
                               -Priority $Priority `
