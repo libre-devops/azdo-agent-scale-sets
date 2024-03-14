@@ -77,27 +77,6 @@ jobs:
         shell: pwsh
         run: |
           
-          function Convert-ToBoolean($value)
-            {
-                $valueLower = $value.ToLower()
-                if ($valueLower -eq "true")
-                {
-                    return $true
-                }
-                elseif ($valueLower -eq "false")
-                {
-                    return $false
-                }
-                else
-                {
-                    throw "[$( $MyInvocation.MyCommand.Name )] Error: Invalid value - $value. Exiting."
-                    exit 1
-                }
-            }
-          
-          $DebugMode = Convert-ToBoolean ${{ inputs.enable_debug_mode }}
-          
-          
           .\Run-Packer.ps1 `
             -WorkingDirectory ${{ inputs.packer_code_location }} `
             -RunPackerInit ${{ inputs.run_packer_init }} `
