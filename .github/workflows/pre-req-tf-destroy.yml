@@ -7,7 +7,7 @@ on:
       terraform_code_location:
         type: string
         description: What working directory should be passed to the script
-        default: "examples/module-development"
+        default: "terraform/0-pre-req"
       run_trivy:
         type: boolean
         description: 'Whether trivy should be ran'
@@ -39,7 +39,7 @@ on:
       terraform_state_name:
         type: string
         description: 'Name of the Terraform state file'
-        default: 'lbd-uks-prd-test-build.terraform.tfstate'
+        default: 'lbd-uks-prd-azdo-pre-req.terraform.tfstate'
 
 jobs:
   run-script:
