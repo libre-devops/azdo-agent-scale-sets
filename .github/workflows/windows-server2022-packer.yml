@@ -66,6 +66,7 @@ jobs:
         run: |
           brew tap kwilczynski/homebrew-pkenv
           brew install pkenv
+          pkenv install latest
 
       - name: Install PowerShell modules
         id: install-powershell-modules
