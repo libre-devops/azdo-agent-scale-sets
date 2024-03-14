@@ -33,7 +33,7 @@ function Manage-CurrentIPInNsg
             $currentIp = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com").Trim()
             if (-not$currentIp)
             {
-                Write-Error "Failed to obtain current IP."
+                Write-Error "[$( $MyInvocation.MyCommand.Name )] Failed to obtain current IP."
                 return
             }
 
@@ -44,7 +44,7 @@ function Manage-CurrentIPInNsg
 
             if ($existingRule)
             {
-                Write-Host "Rule $RuleName already exists. Updating it with the new IP address."
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName already exists. Updating it with the new IP address." -ForegroundColor Green
                 # Remove existing rule to update
                 $Nsg.SecurityRules.Remove($existingRule)
             }
@@ -61,7 +61,7 @@ function Manage-CurrentIPInNsg
                                                     -DestinationPortRange $DestinationPortRange
             $Nsg.SecurityRules.Add($rule)
 
-            Write-Host "Rule $RuleName has been added/updated successfully."
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName has been added/updated successfully." -ForegroundColor Green
         }
         else
         {
@@ -70,21 +70,21 @@ function Manage-CurrentIPInNsg
             if ($existingRule)
             {
                 $Nsg.SecurityRules.Remove($existingRule)
-                Write-Host "Rule $RuleName has been removed successfully."
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName has been removed successfully." -ForegroundColor Green
             }
             else
             {
-                Write-Host "Rule $RuleName does not exist. No action needed."
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName does not exist. No action needed." -ForegroundColor Yellow
             }
         }
 
         # Applying changes to the NSG
-        Set-AzNetworkSecurityGroup -NetworkSecurityGroup $Nsg
-        Write-Host "NSG has been updated successfully."
+        Set-AzNetworkSecurityGroup -NetworkSecurityGroup $Nsg | Out-Null
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] NSG has been updated successfully." -ForegroundColor Green
     }
     catch
     {
-        Write-Error "An error occurred: $_"
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] An error occurred: $_"
     }
 }
 
