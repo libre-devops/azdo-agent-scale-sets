@@ -1,7 +1,5 @@
 param (
-    [Parameter(Mandatory = $true)]
-    [string]$NsgResourceId,
-
+    [string]$NsgResourceId = $null,
     [bool]$AddCurrentClientToNsg = $true,
     [string]$RuleName = "TemporaryAllowCurrentClientIP",
     [int]$Priority = 105,
@@ -116,7 +114,7 @@ try
     }
     else
     {
-        Write-Error "Failed to retrieve the NSG with Resource ID: $NsgResourceId"
+        Write-Information "NSG ID not supplied, so not editing the NSG"
     }
 }
 catch

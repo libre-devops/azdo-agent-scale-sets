@@ -1,69 +1,4 @@
-<#
-.SYNOPSIS
-    This PowerShell script automates tasks related to Packer, including initialization, validation, and build processes.
-
-.DESCRIPTION
-    'Run-Packer.ps1' is a PowerShell script designed to streamline the use of HashiCorp's Packer tool. It checks for the necessary environment setup, such as the presence of the Packer executable and required files, and then proceeds to perform initialization, validation, and building of Packer configurations. The script is configurable via parameters to control the execution of these stages.
-
-.PARAMETERS
-    RunPackerInit
-        Specifies whether to run the Packer initialization process. Accepts 'true' or 'false'.
-
-    RunPackerValidate
-        Specifies whether to run the Packer validation process. Accepts 'true' or 'false'.
-
-    RunPackerBuild
-        Specifies whether to run the Packer build process. Accepts 'true' or 'false'.
-
-    PackerFileName
-        The name of the Packer file to be used, typically a .pkr.hcl file.
-
-    WorkingDirectory
-        The working directory where the Packer file is located and where Packer commands will be executed.
-
-    DebugMode
-        Enables or disables debug mode. Accepts 'true' or 'false'.
-
-    PackerVersion
-        Specifies the version of Packer to use. Default is 'latest'.
-
-.FUNCTIONS
-    Check-PackerFileExists
-        Checks if the specified Packer file exists in the working directory.
-
-    Check-PkenvExists
-        Verifies the presence of pkenv, a Packer version management tool.
-
-    Check-PackerExists
-        Checks if Packer is installed and available in the system's PATH.
-
-    Ensure-PackerVersion
-        Ensures that the desired version of Packer is installed using pkenv.
-
-    Convert-ToBoolean
-        Converts string parameters to boolean values.
-
-    Run-PackerInit
-        Runs the 'packer init' command with the specified options.
-
-    Run-PackerValidate
-        Executes the 'packer validate' command for the Packer file.
-
-    Run-PackerBuild
-        Performs the 'packer build' process using the specified Packer file.
-
-.EXAMPLE
-    .\Run-Packer.ps1 -RunPackerInit "true" -RunPackerValidate "true" -RunPackerBuild "true" -PackerFileName "example.pkr.hcl"
-
-    This example runs the script with all Packer processes enabled using the 'example.pkr.hcl' file.
-
-.NOTES
-    Ensure that all prerequisites, such as Packer and pkenv, are installed and properly configured before running this script.
-    Modify the script parameters based on your specific Packer setup and requirements.
-
-    Author: Craig Thacker
-    Date: 11/12/2023
-#>
+# Run-Packer.ps1 -WorkingDirectory "$(Get-Location)//packer/windows/windows-server2022-azure"
 
 param (
     [string]$RunPackerInit = "true",
@@ -71,23 +6,36 @@ param (
     [string]$RunPackerBuild = "true",
     [string]$PackerFileName = "packer.pkr.hcl",
     [string]$WorkingDirectory = (Get-Location).Path,
-    [string]$DebugMode = "false",
-    [string]$PackerVersion = "default"
+    [string]$PackerVersion = "default",
+    [string]$NsgResourceId = $null,
+    [bool]$AddCurrentClientToNsg = $true,
+    [string]$RuleName = "TemporaryAllowCurrentClientIP",
+    [int]$Priority = 105,
+    [string]$Direction = "Inbound",
+    [string]$Access = "Allow",
+    [string]$Protocol = "Tcp",
+    [string]$SourcePortRange = "*",
+    [string]$DestinationPortRange = "*",
+    [string]$DestinationAddressPrefix = "VirtualNetwork"
 )
 
 # Function to check if the Packer file exists
-function Check-PackerFileExists {
+function Check-PackerFileExists
+{
     $filePath = Join-Path -Path $WorkingDirectory -ChildPath $PackerFileName
-    if (-not (Test-Path -Path $filePath)) {
-        Write-Error "Error: Packer file not found at $filePath. Exiting."
+    if (-not(Test-Path -Path $filePath))
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer file not found at $filePath. Exiting."
         exit 1
     }
-    else {
-        Write-Host "Success: Packer file found at: $filePath" -ForegroundColor Green
+    else
+    {
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Success: Packer file found at: $filePath" -ForegroundColor Green
     }
 }
 
-function New-Password {
+function New-Password
+{
     param (
         [int] $length = 16,
         [string] $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>,.?/:;~`-='
@@ -99,7 +47,7 @@ function New-Password {
     $result = New-Object char[]($length)
 
     $base = $alphabet.Length
-    for ($i = 0 ; $i -lt $length ; $i++) {
+    for ($i = 0; $i -lt $length; $i++) {
         $remainder = $value % $base
         $value = $value / $base
         $result[$i] = $alphabet[$remainder]
@@ -108,140 +56,199 @@ function New-Password {
 }
 
 # Function to check if Tfenv is installed
-function Check-PkenvExists {
-    try {
+function Check-PkenvExists
+{
+    try
+    {
         $pkenvPath = Get-Command pkenv -ErrorAction Stop
-        Write-Host "Success: pkenv found at: $($pkenvPath.Source)" -ForegroundColor Green
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Success: pkenv found at: $( $pkenvPath.Source )" -ForegroundColor Green
         return $true
     }
-    catch {
-        Write-Warning "Warning: pkenv is not installed or not in PATH. Skipping version checking."
+    catch
+    {
+        Write-Warning "[$( $MyInvocation.MyCommand.Name )] Warning: pkenv is not installed or not in PATH. Skipping version checking."
         return $false
     }
 }
 
 # Function to check if Packer is installed
-function Check-PackerExists {
-    try {
+function Check-PackerExists
+{
+    try
+    {
         $packerPath = Get-Command packer -ErrorAction Stop
-        Write-Host "Success: Packer found at: $($packerPath.Source)" -ForegroundColor Green
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Success: Packer found at: $( $packerPath.Source )" -ForegroundColor Green
     }
-    catch {
-        Write-Error "Error: Packer is not installed or not in PATH. Exiting."
+    catch
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer is not installed or not in PATH. Exiting."
         exit 1
     }
 }
 
 # Function to ensure the desired version of Packer is installed
-function Ensure-PackerVersion {
+function Ensure-PackerVersion
+{
     # Check if the specified version is already installed
     $pkrVersion = $PackerVersion.ToLower()
-    if ($pkrVersion -ne 'default') {
-        Write-Host "Success: Packer version is set to '$PackerVersion', running install and use" -ForegroundColor Green
+    if ($pkrVersion -ne 'default')
+    {
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Success: Packer version is set to '$PackerVersion', running install and use" -ForegroundColor Green
         pkenv install $pkrVersion
         pkenv use $pkrVersion
     }
-    else {
-        try {
-            Write-Information "Info: Installing Packer version $Version using pkenv..."
+    else
+    {
+        try
+        {
+            Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: Installing Packer version $Version using pkenv..."
             pkenv install $Version
             pkenv use $Version
-            Write-Host "Success: Installed and set Packer version $Version" -ForegroundColor Green
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Success: Installed and set Packer version $Version" -ForegroundColor Green
         }
-        catch {
-            Write-Error "Error: Failed to install Packer version $Version"
+        catch
+        {
+            Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Failed to install Packer version $Version"
             exit 1
         }
     }
 }
 
 # Function to convert string to boolean
-function Convert-ToBoolean($value) {
+function Convert-ToBoolean($value)
+{
     $valueLower = $value.ToLower()
-    if ($valueLower -eq "true") {
+    if ($valueLower -eq "true")
+    {
         return $true
     }
-    elseif ($valueLower -eq "false") {
+    elseif ($valueLower -eq "false")
+    {
         return $false
     }
-    else {
-        Write-Error "Error: Invalid value - $value. Exiting."
+    else
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Invalid value - $value. Exiting."
         exit 1
     }
 }
 
-$pkenvExists = Check-PkenvExists
-if ($pkenvExists) {
-    Ensure-PackerVersion -Version $PackerVersion
+
+function Manage-CurrentIPInNsg
+{
+    param (
+        [Microsoft.Azure.Commands.Network.Models.PSNetworkSecurityGroup]$Nsg,
+        [bool]$AddRule,
+        [string]$RuleName,
+        [int]$Priority,
+        [string]$Direction,
+        [string]$Access,
+        [string]$Protocol,
+        [string]$SourcePortRange,
+        [string]$DestinationPortRange,
+        [string]$DestinationAddressPrefix
+    )
+
+    try
+    {
+        if ($AddRule)
+        {
+            $currentIp = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com").Trim()
+            if (-not$currentIp)
+            {
+                Write-Error "[$( $MyInvocation.MyCommand.Name )] Failed to obtain current IP."
+                return
+            }
+
+            $sourceAddressPrefix = $currentIp
+
+            # Check if the rule already exists
+            $existingRule = $Nsg.SecurityRules | Where-Object { $_.Name -eq $RuleName }
+
+            if ($existingRule)
+            {
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName already exists. Updating it with the new IP address." -ForegroundColor Green
+                # Remove existing rule to update
+                $Nsg.SecurityRules.Remove($existingRule)
+            }
+
+            # Adding the rule
+            $rule = New-AzNetworkSecurityRuleConfig -Name $RuleName `
+                                                    -Access $Access `
+                                                    -Protocol $Protocol `
+                                                    -Direction $Direction `
+                                                    -Priority $Priority `
+                                                    -SourceAddressPrefix $sourceAddressPrefix `
+                                                    -SourcePortRange $SourcePortRange `
+                                                    -DestinationAddressPrefix $DestinationAddressPrefix `
+                                                    -DestinationPortRange $DestinationPortRange
+            $Nsg.SecurityRules.Add($rule)
+
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName has been added/updated successfully." -ForegroundColor Green
+        }
+        else
+        {
+            # Removing the rule
+            $existingRule = $Nsg.SecurityRules | Where-Object { $_.Name -eq $RuleName }
+            if ($existingRule)
+            {
+                $Nsg.SecurityRules.Remove($existingRule)
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName has been removed successfully." -ForegroundColor Green
+            }
+            else
+            {
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Rule $RuleName does not exist. No action needed." -ForegroundColor Yellow
+            }
+        }
+
+        # Applying changes to the NSG
+        Set-AzNetworkSecurityGroup -NetworkSecurityGroup $Nsg
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] NSG has been updated successfully." -ForegroundColor Green
+    }
+    catch
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] An error occurred: $_"
+    }
 }
 
-if (Check-PackerFileExists) {
-    $filePath = Join-Path -Path $WorkingDirectory -ChildPath $PackerFileName
-}
-
-# Convert string parameters to boolean
-$RunPackerInit = Convert-ToBoolean $RunPackerInit
-$RunPackerValidate = Convert-ToBoolean $RunPackerValidate
-$RunPackerBuild = Convert-ToBoolean $RunPackerBuild
-$DebugMode = Convert-ToBoolean $DebugMode
-
-# Enable debug mode if DebugMode is set to $true
-if ($DebugMode) {
-    $DebugPreference = "Continue"
-}
-
-# Diagnostic output
-Write-Debug "RunPackerInit: $RunPackerinit"
-Write-Debug "RunPackerValidate: $RunPackerValidate"
-Write-Debug "RunPackerBuild: $RunPackerBuild"
-Write-Debug "DebugMode: $DebugMode"
-
-
-if ($RunPackerInit -eq $false) {
-    Write-Error "Error: You must run packer init to use this script, it does not support false use of it at this time."
-    exit 1
-}
-
-# Change to the specified working directory
-try {
-    $CurrentWorkingDirectory = (Get-Location).path
-    Set-Location -Path $WorkingDirectory
-}
-catch {
-    Write-Error "Error: Unable to change to directory: $WorkingDirectory"
-    exit 1
-}
-
-Check-PackerFileExists
-
-function Run-PackerInit {
-    if ($RunPackerInit -eq $true) {
-        try {
-            if ($isWindows) {
-                Write-Host "Info: Running Packer init in $WorkingDirectory" -ForegroundColor Green
+function Run-PackerInit
+{
+    if ($RunPackerInit -eq $true)
+    {
+        try
+        {
+            if ($isWindows)
+            {
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Running Packer init in $WorkingDirectory" -ForegroundColor Green
                 packer init -upgrade $PackerFileName | Out-Host
-                if ($LASTEXITCODE -eq 0) {
+                if ($LASTEXITCODE -eq 0)
+                {
                     return $true
                 }
-                else {
-                    Write-Error "Error: Packer init failed with exit code $LASTEXITCODE"
+                else
+                {
+                    Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer init failed with exit code $LASTEXITCODE"
                     return $false
                 }
             }
-            else {
-                Write-Host "Info: Running Packer init in $WorkingDirectory" -ForegroundColor Green
+            else
+            {
+                Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Running Packer init in $WorkingDirectory" -ForegroundColor Green
                 packer init -force $PackerFileName | Out-Host
-                if ($LASTEXITCODE -eq 0) {
+                if ($LASTEXITCODE -eq 0)
+                {
                     return $true
                 }
-                else {
-                    Write-Error "Error: Packer init failed with exit code $LASTEXITCODE"
+                else
+                {
+                    Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer init failed with exit code $LASTEXITCODE"
                     return $false
                 }
             }
         }
-        catch {
-            Write-Error "Error: Packer init encountered an exception"
+        catch
+        {
+            Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer init encountered an exception"
             return $false
         }
     }
@@ -249,65 +256,164 @@ function Run-PackerInit {
 }
 
 
-function Run-PackerValidate {
-    if ($RunPackerValidate -eq $true) {
-        try {
-            Write-Host "Info: Running Packer validate in $WorkingDirectory" -ForegroundColor Green
+function Run-PackerValidate
+{
+    if ($RunPackerValidate -eq $true)
+    {
+        try
+        {
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Running Packer validate in $WorkingDirectory" -ForegroundColor Green
             packer validate $PackerFileName | Out-Host
-            if ($LASTEXITCODE -eq 0) {
+            if ($LASTEXITCODE -eq 0)
+            {
                 return $true
             }
-            else {
-                Write-Error "Error: Packer validate failed with exit code $LASTEXITCODE"
+            else
+            {
+                Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer validate failed with exit code $LASTEXITCODE"
                 return $false
             }
         }
-        catch {
-            Write-Error "Error: Packer validate encountered an exception"
+        catch
+        {
+            Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer validate encountered an exception"
             return $false
         }
     }
     return $false
 }
 
-function Run-PackerBuild {
-    if ($RunPackerBuild -eq $true) {
-        try {
-            Write-Host "Info: Running Packer build in $WorkingDirectory" -ForegroundColor Green
+function Run-PackerBuild
+{
+    if ($RunPackerBuild -eq $true)
+    {
+        try
+        {
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Running Packer build in $WorkingDirectory" -ForegroundColor Green
             packer build $PackerFileName | Out-Host
-            if ($LASTEXITCODE -eq 0) {
+            if ($LASTEXITCODE -eq 0)
+            {
                 return $true
             }
-            else {
-                Write-Error "Error: Packer build failed with exit code $LASTEXITCODE"
+            else
+            {
+                Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer build failed with exit code $LASTEXITCODE"
                 return $false
             }
         }
-        catch {
-            Write-Error "Error: Packer build encountered an exception"
+        catch
+        {
+            Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Packer build encountered an exception"
             return $false
         }
     }
     return $false
 }
 
-# Execution flow
-$initSuccess = Run-PackerInit
-if ($initSuccess -eq $true) {
-    $validateSuccess = Run-PackerValidate
-    $packerPassword = New-Password
-    Set-Item -Path Env:PKR_VAR_install_password -Value $packerPassword
 
-    if ($validateSuccess -eq $true) {
-        Run-PackerBuild
+try
+{
+    if ($null -ne $NsgResourceId)
+    {
+        # Extract Resource Group Name and NSG Name from the Resource ID
+        $resourceIdParts = $NsgResourceId -split '/'
+        $resourceGroupName = $resourceIdParts[4]
+        $nsgName = $resourceIdParts[-1]
+
+        # Retrieve the NSG object
+        $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
+
+        Manage-CurrentIPInNsg -Nsg $nsg `
+                              -AddRule $AddCurrentClientToNsg `
+                              -RuleName $RuleName `
+                              -Priority $Priority `
+                              -Direction $Direction `
+                              -Access $Access `
+                              -Protocol $Protocol `
+                              -SourcePortRange $SourcePortRange `
+                              -DestinationPortRange $DestinationPortRange `
+                              -DestinationAddressPrefix $DestinationAddressPrefix
     }
-    else {
-        Write-Host "Packer validate failed. Skipping Packer build."
+    else
+    {
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] NSG ID not supplied, so not editing the NSG"
     }
-}
-else {
-    Write-Host "Packer init failed. Skipping Packer validate and Packer build."
-}
+    # Convert string parameters to boolean
+    $RunPackerInit = Convert-ToBoolean $RunPackerInit
+    $RunPackerValidate = Convert-ToBoolean $RunPackerValidate
+    $RunPackerBuild = Convert-ToBoolean $RunPackerBuild
 
+    if ($RunPackerInit -eq $false)
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: You must run packer init to use this script, it does not support false use of it at this time."
+        exit 1
+    }
+    # Change to the specified working directory
+    try
+    {
+        $CurrentWorkingDirectory = (Get-Location).path
+        Set-Location -Path $WorkingDirectory
+    }
+    catch
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Unable to change to directory: $WorkingDirectory"
+        exit 1
+    }
 
-Set-Location $CurrentWorkingDirectory
+    Check-PackerFileExists
+
+    # Execution flow
+    $initSuccess = Run-PackerInit
+    if ($initSuccess -eq $true)
+    {
+        $validateSuccess = Run-PackerValidate
+        $packerPassword = New-Password
+        Set-Item -Path Env:PKR_VAR_install_password -Value $packerPassword
+
+        if ($validateSuccess -eq $true)
+        {
+            Run-PackerBuild
+        }
+        else
+        {
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Packer validate failed. Skipping Packer build."
+        }
+    }
+    else
+    {
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Packer init failed. Skipping Packer validate and Packer build."
+    }
+
+}
+catch
+{
+    Write-Error "[$( $MyInvocation.MyCommand.Name )] An error occurred: $_"
+}
+finally
+{
+    if ($null -ne $NsgResourceId)
+    {
+        # Extract Resource Group Name and NSG Name from the Resource ID
+        $resourceIdParts = $NsgResourceId -split '/'
+        $resourceGroupName = $resourceIdParts[4]
+        $nsgName = $resourceIdParts[-1]
+
+        # Retrieve the NSG object
+        $nsg = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $resourceGroupName
+        Manage-CurrentIPInNsg -Nsg $nsg `
+                              -AddRule $false `
+                              -RuleName $RuleName `
+                              -Priority $Priority `
+                              -Direction $Direction `
+                              -Access $Access `
+                              -Protocol $Protocol `
+                              -SourcePortRange $SourcePortRange `
+                              -DestinationPortRange $DestinationPortRange `
+                              -DestinationAddressPrefix $DestinationAddressPrefix
+    }
+    else
+    {
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] NSG ID not supplied, so not editing the NSG"
+    }
+    Set-Location $CurrentWorkingDirectory
+}
