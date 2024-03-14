@@ -82,7 +82,7 @@ jobs:
         run: |
           
           .\Run-AzPacker.ps1 `
-            -WorkingDirectory ${{ inputs.packer_code_location }} `
+            -WorkingDirectory "$(Get-Location)/${{ inputs.packer_code_location }}" `
             -RunPackerInit ${{ inputs.run_packer_init }} `
             -AttemptLoginForNsg ${{ inputs.attempt_login_for_nsg }} `
             -RunPackerValidate ${{ inputs.run_packer_validate }} `
