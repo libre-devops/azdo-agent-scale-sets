@@ -45,8 +45,7 @@ variable "install_user" {
 }
 
 locals {
-  image_version         = formatdate("YYYY.MM.DD", timestamp())
-  image_os              = "windowsserver2022azure"
+  image_version         = formatdate("YYYYMM.DD.HHmmss", timestamp())
   short                 = "lbd"
   env                   = "prd"
   loc                   = "uks"
@@ -131,11 +130,11 @@ source "azure-arm" "build" {
 
   // Shared image gallery is created by terraform in the pre-req step, as is the resource group.
   shared_image_gallery_destination {
-    gallery_name   = local.gallery_name
-    image_name     = local.image_name
-    image_version  = local.image_version
-    resource_group = local.gallery_rg_name
-    subscription   = var.subscription_id
+    gallery_name        = local.gallery_name
+    image_name          = local.image_name
+    image_version       = local.image_version
+    resource_group      = local.gallery_rg_name
+    subscription        = var.subscription_id
     replication_regions = [
       "uksouth"
     ]
