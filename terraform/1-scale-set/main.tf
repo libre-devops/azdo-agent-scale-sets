@@ -2,6 +2,31 @@ module "shared_vars" {
   source = "libre-devops/shared-vars/azurerm"
 }
 
+locals {
+  lookup_cidr = {
+    for landing_zone, envs in module.shared_vars.cidrs : landing_zone => {
+      for env, cidr in envs : env => cidr
+    }
+  }
+}
+
+
+resource "azurerm_application_security_group" "server_asg" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  tags                = data.azurerm_resource_group.rg.tags
+
+  name = "asg-${var.short}-${var.loc}-${var.env}-01"
+}
+
+
+module "subnet_calculator" {
+  source = "libre-devops/subnet-calculator/null"
+
+  base_cidr    = local.lookup_cidr[var.short][var.env][0]
+  subnet_sizes = [26, 26]
+}
+
 module "bastion" {
   source = "libre-devops/bastion/azurerm"
 
@@ -15,15 +40,7 @@ module "bastion" {
   create_bastion_subnet              = true
   bastion_subnet_target_vnet_name    = data.azurerm_virtual_network.vnet.name
   bastion_subnet_target_vnet_rg_name = data.azurerm_virtual_network.vnet.resource_group_name
-  bastion_subnet_range               = "10.0.1.0/27"
-}
-
-resource "azurerm_application_security_group" "server_asg" {
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
-  tags                = data.azurerm_resource_group.rg.tags
-
-  name = "asg-${var.short}-${var.loc}-${var.env}-vmss-01"
+  bastion_subnet_range               = module.subnet_calculator.subnet_ranges[1]
 }
 
 locals {
@@ -31,11 +48,11 @@ locals {
 }
 
 module "windows_vm_scale_set" {
-  source = "libre-devops/windows-vm-scale-sets/azurerm"
+  source = "libre-devops/windows-uniform-orchestration-vm-scale-sets/azurerm"
 
-  resource_group_name = data.azurerm_resource_group.rg.name
-  location            = data.azurerm_resource_group.rg.location
-  tags                = data.azurerm_resource_group.rg.tags
+  rg_name  = data.azurerm_resource_group.rg.name
+  location = data.azurerm_resource_group.rg.location
+  tags     = data.azurerm_resource_group.rg.tags
 
   scale_sets = [
     {
@@ -47,20 +64,23 @@ module "windows_vm_scale_set" {
       admin_password                  = data.azurerm_key_vault_secret.admin_pwd.value
       instances                       = 1
       sku                             = "Standard_B2ms"
-      source_image_id                 = ""
+      vm_os_simple                    = false
+      use_custom_image                = true
+      custom_source_image_id          = data.azurerm_shared_image.azdo_win_image.id
       disable_password_authentication = true
       overprovision                   = true
       upgrade_mode                    = "Manual"
+      enable_automatic_updates        = true
       create_asg                      = true
 
-      identity_type = "SystemAssigned, UserAssigned"
-      identity_ids  = [data.azurerm_user_assigned_identity.uid.id]
+      identity_type     = "SystemAssigned, UserAssigned"
+      identity_ids      = [data.azurerm_user_assigned_identity.uid.id]
       network_interface = [
         {
           name                          = "nic-${local.name}"
           primary                       = true
           enable_accelerated_networking = false
-          ip_configuration = [
+          ip_configuration              = [
             {
               name                           = "ipconfig-${local.name}"
               primary                        = true
