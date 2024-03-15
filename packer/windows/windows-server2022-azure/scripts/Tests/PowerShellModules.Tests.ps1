@@ -13,7 +13,7 @@ Describe "PowerShellModules" {
 
     It "<moduleName> is installed" -TestCases $withoutVersionsModules {
         param($moduleName)
-        if ($moduleName -eq "Az")
+        if ($moduleName -eq "Az" -or "AzureAD" )
         {
             # Use Get-InstalledModule for the Az module to check if it's installed
             { Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue } | Should -Not -Throw
