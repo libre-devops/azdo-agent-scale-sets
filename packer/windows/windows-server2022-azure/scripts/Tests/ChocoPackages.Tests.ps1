@@ -39,3 +39,12 @@ Describe "Packer" {
 }
 
 
+Describe "Cygwin" {
+    It "bash version should be available" {
+        # This command runs `bash --version` and captures the output
+        $bashVersion = & bash --version
+        # The test passes if $bashVersion is not null or empty, indicating `bash --version` executed successfully
+        $bashVersion | Should -Not -BeNullOrEmpty
+    }
+}
+

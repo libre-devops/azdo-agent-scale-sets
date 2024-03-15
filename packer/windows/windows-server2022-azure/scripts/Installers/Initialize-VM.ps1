@@ -15,15 +15,15 @@ function Disable-UserAccessControl {
     Write-Host "User Access Control (UAC) has been disabled."
 }
 
-function Disable-WindowsUpdate {
-    $AutoUpdatePath = "HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"
-    If (Test-Path -Path $AutoUpdatePath) {
-        Set-ItemProperty -Path $AutoUpdatePath -Name NoAutoUpdate -Value 1
-        Write-Host "Disabled Windows Update"
-    } else {
-        Write-Host "Windows Update key does not exist"
-    }
-}
+#function Disable-WindowsUpdate {
+#    $AutoUpdatePath = "HKLM:SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"
+#    If (Test-Path -Path $AutoUpdatePath) {
+#        Set-ItemProperty -Path $AutoUpdatePath -Name NoAutoUpdate -Value 1
+#        Write-Host "Disabled Windows Update"
+#    } else {
+#        Write-Host "Windows Update key does not exist"
+#    }
+#}
 
 # Enable $ErrorActionPreference='Stop' for AllUsersAllHosts
 Add-Content -Path $profile.AllUsersAllHosts -Value '$ErrorActionPreference="Stop"'
@@ -31,8 +31,8 @@ Add-Content -Path $profile.AllUsersAllHosts -Value '$ErrorActionPreference="Stop
 Write-Host "Disable 'Allow your PC to be discoverable by other PCs' popup"
 New-Item -Path HKLM:\System\CurrentControlSet\Control\Network -Name NewNetworkWindowOff -Force
 
-Write-Host "Disable Windows Update"
-Disable-WindowsUpdate
+#Write-Host "Disable Windows Update"
+#Disable-WindowsUpdate
 
 Write-Host "Disable UAC"
 Disable-UserAccessControl
