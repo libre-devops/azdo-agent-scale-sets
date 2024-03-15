@@ -40,9 +40,20 @@ function Check-PackerFileExists
 function New-Password
 {
     param (
-        [int] $length = 16,
-        [string] $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>,.?/:;~`-='
+        [int] $length = 18,
+        [string] $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>,.?/:;~`-=',
+        [string] $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        [string] $lower = 'abcdefghijklmnopqrstuvwxyz',
+        [string] $numbers = '0123456789',
+        [string] $special = '!@#$%^&*()_+<>,.?/:;~`-='
     )
+
+    if ($length -lt 4)
+    {
+        Write-Error "Length must be at least 4 to ensure complexity requirements."
+        return
+    }
+
     $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
     $bytes = New-Object byte[]($length)
     $rng.GetBytes($bytes)
@@ -55,8 +66,19 @@ function New-Password
         $value = $value / $base
         $result[$i] = $alphabet[$remainder]
     }
+
+    # Ensuring at least one character from each category
+    $result[0] = $upper[($bytes[0] % $upper.Length)]
+    $result[1] = $lower[($bytes[1] % $lower.Length)]
+    $result[2] = $numbers[($bytes[2] % $numbers.Length)]
+    $result[3] = $special[($bytes[3] % $special.Length)]
+
+    # Shuffle the result to distribute the guaranteed characters randomly
+    $result = $result | Sort-Object { Get-Random }
+
     return (-join $result)
 }
+
 
 function Update-KeyVaultNetworkRule
 {
