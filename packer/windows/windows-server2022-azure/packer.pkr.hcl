@@ -137,7 +137,7 @@ source "azure-arm" "build" {
     resource_group = local.gallery_rg_name
     subscription   = var.subscription_id
     replication_regions = [
-      "ukwest"
+      "uksouth"
     ]
   }
 }

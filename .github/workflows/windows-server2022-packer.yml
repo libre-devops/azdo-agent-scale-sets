@@ -36,9 +36,10 @@ on:
         type: boolean
         description: 'Whether to add your outbound client IP to an NSG'
         default: true
-      nsg_resource_id:
-        type: string
-        description: 'NSG resource ID if you want to add a NSG rule'
+      add_client_to_keyvault:
+        type: boolean
+        description: 'Whether to add your outbound client IP to an keyvault'
+        default: true
 
 jobs:
   run-script:
@@ -99,7 +100,9 @@ jobs:
             -AttemptLoginForNsg ${{ inputs.attempt_login_for_nsg }} `
             -RunPackerValidate ${{ inputs.run_packer_validate }} `
             -AddCurrentClientToNsg ${{ inputs.add_client_to_nsg }} `
-            -NsgResourceId ${{ vars.nsgid }}
+            -NsgResourceId ${{ vars.nsgid }} `
+            -AddCurrentClientToKeyvault ${{ inputs.add_client_to_nsg }} `
+            -KeyvaultResourceId ${{ vars.keyvaultid }} `
         env:
           PKR_VAR_ARM_CLIENT_ID: ${{ secrets.SpokeSvpApplicationId }}
           PKR_VAR_ARM_CLIENT_SECRET: ${{ secrets.SpokeSvpClientSecret }}
@@ -107,5 +110,5 @@ jobs:
           PKR_VAR_ARM_TENANT_ID: ${{ secrets.SpokeSvpTenantId }}
           ARM_CLIENT_ID: ${{ secrets.SpokeSvpApplicationId }}
           ARM_CLIENT_SECRET: ${{ secrets.SpokeSvpClientSecret }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.SpokeSubscriptionId }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SpokeSubscriptionId }}it
           ARM_TENANT_ID: ${{ secrets.SpokeSvpTenantId }}

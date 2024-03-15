@@ -8,7 +8,9 @@ param (
     [string]$WorkingDirectory = (Get-Location).Path,
     [string]$PackerVersion = "default",
     [string]$NsgResourceId = $null,
+    [string]$KeyvaultResourceId = $null,
     [string]$AddCurrentClientToNsg = "true",
+    [string]$AddCurrentClientToKeyvault = "true",
     [string]$AttemptAzLogin = "true",
     [string]$RuleName = "TemporaryAllowCurrentClientIP",
     [int]$Priority = 105,
@@ -54,6 +56,60 @@ function New-Password
         $result[$i] = $alphabet[$remainder]
     }
     return (-join $result)
+}
+
+function Update-KeyVaultNetworkRule
+{
+    param (
+        [string]$KeyVaultName,
+        [string]$ResourceGroupName,
+        [bool]$AddClientIP
+    )
+
+    try
+    {
+        $keyVault = Get-AzKeyVault -VaultName $KeyVaultName -ResourceGroupName $ResourceGroupName
+        $currentNetworkAcls = $keyVault.NetworkAcls
+
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Fetching current IP rules for Key Vault: $KeyVaultName"
+        $currentIps = $currentNetworkAcls.IpAddressRanges | ForEach-Object { $_ -replace '/32$', '' }
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Current IP rules: $( $currentIps -join ', ' )"
+
+        $currentIp = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com").Trim()
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Current client IP: $currentIp"
+
+        $ipAlreadyExists = $currentIps -contains $currentIp
+        $newIpRules = $currentIps
+
+        if ($AddClientIP -and -not$ipAlreadyExists)
+        {
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Appending current client IP to existing IP rules." -ForegroundColor Green
+            $newIpRules += $currentIp
+        }
+        elseif (-not$AddClientIP -and $ipAlreadyExists)
+        {
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Removing current client IP from existing IP rules." -ForegroundColor Green
+            $newIpRules = $newIpRules | Where-Object { $_ -ne $currentIp }
+        }
+        else
+        {
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: No changes needed for the IP rules." -ForegroundColor Green
+            return
+        }
+
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: Updating IP rules: $( $newIpRules -join ', ' )"
+        # Reapply /32 subnet notation for consistent Azure Key Vault rules format
+        $newIpRules = $newIpRules | ForEach-Object { "$_/32" }
+
+        Update-AzKeyVaultNetworkRuleSet -VaultName $KeyVaultName -ResourceGroupName $ResourceGroupName `
+            -IpAddressRange $newIpRules -Bypass $currentNetworkAcls.Bypass -DefaultAction $currentNetworkAcls.DefaultAction
+
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Key Vault network configuration updated." -ForegroundColor Green
+    }
+    catch
+    {
+        Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: An error occurred: $_"
+    }
 }
 
 # Function to check if Tfenv is installed
@@ -346,7 +402,9 @@ function Run-PackerBuild
 try
 {
     $ConvertedAddCurrentClientToNsg = Convert-ToBoolean $AddCurrentClientToNsg
+    $ConvertedAddCurrentClientToKeyvault = Convert-ToBoolean $AddCurrentClientToKeyvault
     $ConvertedAttemptAzLogin = Convert-ToBoolean $AttemptAzLogin
+
     if ($ConvertedAttemptAzLogin)
     {
         Connect-AzAccountWithServicePrincipal `
@@ -381,6 +439,27 @@ try
     else
     {
         Write-Information "[$( $MyInvocation.MyCommand.Name )] NSG ID not supplied, so not editing the NSG"
+    }
+    if ($null -ne $KeyvaultResourceId)
+    {
+        Write-Host "Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag."
+
+        $kvresourceIdParts = $KeyVaultResourceId -split '/'
+        $kvresourceGroupName = $kvresourceIdParts[4]
+        $keyVaultName = $kvresourceIdParts[-1]
+
+        if ($null -ne $keyVaultName)
+        {
+            Update-KeyVaultNetworkRule -KeyVaultName $keyVaultName -ResourceGroupName $kvresourceGroupName -AddClientIP $AddClientIPToFirewall
+        }
+        else
+        {
+            Write-Error "Key Vault Resource ID not properly supplied."
+        }
+    }
+    else
+    {
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Key vault ID not supplied, so not editing key vault"
     }
     # Convert string parameters to boolean
     $RunPackerInit = Convert-ToBoolean $RunPackerInit
@@ -459,6 +538,27 @@ finally
     else
     {
         Write-Information "[$( $MyInvocation.MyCommand.Name )] NSG ID not supplied, so not editing the NSG"
+    }
+    if ($null -ne $KeyvaultResourceId)
+    {
+        Write-Host "Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag."
+
+        $kvresourceIdParts = $KeyVaultResourceId -split '/'
+        $kvresourceGroupName = $kvresourceIdParts[4]
+        $keyVaultName = $kvresourceIdParts[-1]
+
+        if ($null -ne $keyVaultName)
+        {
+            Update-KeyVaultNetworkRule -KeyVaultName $keyVaultName -ResourceGroupName $kvresourceGroupName -AddClientIP $AddClientIPToFirewall
+        }
+        else
+        {
+            Write-Error "Key Vault Resource ID not properly supplied."
+        }
+    }
+    else
+    {
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Key vault ID not supplied, so not editing key vault"
     }
     Set-Location $CurrentWorkingDirectory
 }
