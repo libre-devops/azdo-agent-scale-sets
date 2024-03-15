@@ -5,6 +5,7 @@ param (
     [string]$RunPackerValidate = "true",
     [string]$RunPackerBuild = "true",
     [string]$PackerFileName = "packer.pkr.hcl",
+    [string]$ForcePackerBuild = "true",
     [string]$WorkingDirectory = (Get-Location).Path,
     [string]$PackerVersion = "default",
     [string]$NsgResourceId = $null,
@@ -227,11 +228,11 @@ function Connect-AzAccountWithServicePrincipal
     {
         $SecureSecret = $Secret | ConvertTo-SecureString -AsPlainText -Force
         $Credential = New-Object System.Management.Automation.PSCredential ($ApplicationId, $SecureSecret)
-        Connect-AzAccount -ServicePrincipal -Credential $Credential -Tenant $TenantId -ErrorAction Stop
+        Connect-AzAccount -ServicePrincipal -Credential $Credential -Tenant $TenantId -ErrorAction Stop | Out-Null
 
         if (-not [string]::IsNullOrEmpty($SubscriptionId))
         {
-            Set-AzContext -SubscriptionId $SubscriptionId
+            Set-AzContext -SubscriptionId $SubscriptionId | Out-Null
         }
 
         Write-Host "[$( $MyInvocation.MyCommand.Name )] Success: Successfully logged in to Azure." -ForegroundColor Cyan
@@ -400,7 +401,14 @@ function Run-PackerBuild
         try
         {
             Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Running Packer build in $WorkingDirectory" -ForegroundColor Green
-            packer build $PackerFileName | Out-Host
+            if ($ConvertedForcePackerBuild)
+            {
+                packer build $PackerFileName -force| Out-Host
+            }
+            else
+            {
+                packer build $PackerFileName | Out-Host
+            }
             if ($LASTEXITCODE -eq 0)
             {
                 return $true
@@ -426,6 +434,7 @@ try
     $ConvertedAddCurrentClientToNsg = Convert-ToBoolean $AddCurrentClientToNsg
     $ConvertedAddCurrentClientToKeyvault = Convert-ToBoolean $AddCurrentClientToKeyvault
     $ConvertedAttemptAzLogin = Convert-ToBoolean $AttemptAzLogin
+    $ConvertedForcePackerBuild = Convert-ToBoolean $ForcePackerBuild
 
     if ($ConvertedAttemptAzLogin)
     {
