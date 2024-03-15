@@ -136,9 +136,9 @@ source "azure-arm" "build" {
     image_version  = local.image_version
     resource_group = local.gallery_rg_name
     subscription   = var.subscription_id
-    replication_regions = [
-      "uksouth"
-    ]
+#    replication_regions = [
+#      "uksouth"
+#    ]
   }
 }
 
