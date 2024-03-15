@@ -178,14 +178,15 @@ build {
       # Create a secure string for the password
       "$password = ConvertTo-SecureString '${var.install_password}' -AsPlainText -Force",
       # Create the user with the secure password
-      "New-LocalUser -Name '${var.install_user}' -Password $password -PasswordNeverExpires -UserMayNotChangePassword -AccountActive $true",
-      # Add the user to the Administrators group
-      "Add-LocalGroupMember -Group 'Administrators' -Member '${var.install_user}'",
+      "New-LocalUser -Name '${var.install_user}' -Password $password -PasswordNeverExpires -UserMayNotChangePassword",
+      # Ensure the user creation command succeeded before attempting to add to group
+      "if ($?) { Add-LocalGroupMember -Group 'Administrators' -Member '${var.install_user}' } else { Write-Error 'User creation failed.' }",
       # Configure WinRM
       "winrm set winrm/config/service/auth '@{Basic=\"true\"}'",
       "winrm get winrm/config/service/auth"
     ]
   }
+
 
   provisioner "powershell" {
     inline = ["if (-not ((net localgroup Administrators) -contains '${var.install_user}')) { exit 1 }"]
