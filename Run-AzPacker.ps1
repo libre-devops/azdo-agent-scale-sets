@@ -549,7 +549,7 @@ finally
 
         if ($null -ne $keyVaultName)
         {
-            Update-KeyVaultNetworkRule -KeyVaultName $keyVaultName -ResourceGroupName $kvresourceGroupName -AddClientIP $ConvertedAddCurrentClientToKeyvault
+            Update-KeyVaultNetworkRule -KeyVaultName $keyVaultName -ResourceGroupName $kvresourceGroupName -AddClientIP $false
         }
         else
         {
