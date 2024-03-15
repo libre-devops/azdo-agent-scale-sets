@@ -103,7 +103,7 @@ jobs:
             -AddCurrentClientToNsg ${{ inputs.add_client_to_nsg }} `
             -NsgResourceId ${{ vars.nsgid }} `
             -AddCurrentClientToKeyvault ${{ inputs.add_client_to_nsg }} `
-            -KeyvaultResourceId ${{ vars.keyvaultid }} `
+            -KeyvaultResourceId ${{ vars.keyvaultid }}
         env:
           PKR_VAR_ARM_CLIENT_ID: ${{ secrets.SpokeSvpApplicationId }}
           PKR_VAR_ARM_CLIENT_SECRET: ${{ secrets.SpokeSvpClientSecret }}

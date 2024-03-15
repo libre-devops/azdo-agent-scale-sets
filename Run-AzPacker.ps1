@@ -442,7 +442,7 @@ try
     }
     if ($null -ne $KeyvaultResourceId)
     {
-        Write-Host "Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag."
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag." -ForegroundColor Cyan
 
         $kvresourceIdParts = $KeyVaultResourceId -split '/'
         $kvresourceGroupName = $kvresourceIdParts[4]
@@ -454,7 +454,7 @@ try
         }
         else
         {
-            Write-Error "Key Vault Resource ID not properly supplied."
+            Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: Key Vault Resource ID not properly supplied."
         }
     }
     else
