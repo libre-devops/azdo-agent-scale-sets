@@ -41,7 +41,7 @@ function Check-PackerFileExists
 function New-Password
 {
     param (
-        [int] $length = 16,
+        [int] $partLength = 5, # Length of each part of the password
         [string] $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>,.?/:;~`-=',
         [string] $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         [string] $lower = 'abcdefghijklmnopqrstuvwxyz',
@@ -49,36 +49,46 @@ function New-Password
         [string] $special = '!@#$%^&*()_+<>,.?/:;~`-='
     )
 
-    if ($length -lt 4)
+    # Helper function to generate a random sequence from the alphabet
+    function Generate-RandomSequence
     {
-        Write-Error "Length must be at least 4 to ensure complexity requirements."
+        param (
+            [int] $length,
+            [string] $alphabet
+        )
+
+        $sequence = New-Object char[] $length
+        for ($i = 0; $i -lt $length; $i++) {
+            $randomIndex = Get-Random -Minimum 0 -Maximum $alphabet.Length
+            $sequence[$i] = $alphabet[$randomIndex]
+        }
+
+        return $sequence -join ''
+    }
+
+    # Ensure each part has at least one character of each type
+    $minLength = 4
+    if ($partLength -lt $minLength)
+    {
+        Write-Error "Each part of the password must be at least $minLength characters to ensure complexity."
         return
     }
 
-    $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
-    $bytes = New-Object byte[]($length)
-    $rng.GetBytes($bytes)
-    $value = [system.numerics.BigInteger]::Abs([bigint]$bytes)
-    $result = New-Object char[]($length)
+    $part1 = Generate-RandomSequence -length $partLength -alphabet $alphabet
+    $part2 = Generate-RandomSequence -length $partLength -alphabet $alphabet
+    $part3 = Generate-RandomSequence -length $partLength -alphabet $alphabet
 
-    $base = $alphabet.Length
-    for ($i = 0; $i -lt $length; $i++) {
-        $remainder = $value % $base
-        $value = $value / $base
-        $result[$i] = $alphabet[$remainder]
-    }
+    # Ensuring at least one character from each category in each part
+    $part1 = $upper[(Get-Random -Maximum $upper.Length)] + $part1.Substring(1)
+    $part2 = $lower[(Get-Random -Maximum $lower.Length)] + $part2.Substring(1)
+    $part3 = $numbers[(Get-Random -Maximum $numbers.Length)] + $special[(Get-Random -Maximum $special.Length)] + $part3.Substring(2)
 
-    # Ensuring at least one character from each category
-    $result[0] = $upper[($bytes[0] % $upper.Length)]
-    $result[1] = $lower[($bytes[1] % $lower.Length)]
-    $result[2] = $numbers[($bytes[2] % $numbers.Length)]
-    $result[3] = $special[($bytes[3] % $special.Length)]
+    # Concatenate parts with separators
+    $password = "$part1-$part2-$part3"
 
-    # Shuffle the result to distribute the guaranteed characters randomly
-    $result = $result | Sort-Object { Get-Random }
-
-    return (-join $result)
+    return $password
 }
+
 
 
 function Update-KeyVaultNetworkRule
