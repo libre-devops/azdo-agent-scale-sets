@@ -403,7 +403,7 @@ function Run-PackerBuild
             Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Running Packer build in $WorkingDirectory" -ForegroundColor Green
             if ($ConvertedForcePackerBuild)
             {
-                packer build $PackerFileName -force| Out-Host
+                packer build -force $PackerFileName | Out-Host
             }
             else
             {
