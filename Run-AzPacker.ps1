@@ -41,7 +41,7 @@ function Check-PackerFileExists
 function New-Password
 {
     param (
-        [int] $length = 18,
+        [int] $length = 16,
         [string] $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>,.?/:;~`-=',
         [string] $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
         [string] $lower = 'abcdefghijklmnopqrstuvwxyz',
