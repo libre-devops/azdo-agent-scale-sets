@@ -44,7 +44,14 @@ variable "install_user" {
   description = "The initial user used to install stuff - needed"
 }
 
+variable "deploy_gui" {
+  type        = bool
+  default     = true
+  description = "Whether to deploy a Windows Server with or without a GUI"
+}
+
 locals {
+  deploy_gui            = var.deploy_gui
   image_version         = formatdate("YYYYMM.DD.HHmmss", timestamp())
   image_os              = "windowsserver2022azure"
   short                 = "lbd"
@@ -108,7 +115,7 @@ source "azure-arm" "build" {
   os_type                   = "Windows"
   image_publisher           = "MicrosoftWindowsServer"
   image_offer               = "WindowsServer"
-  image_sku                 = "2022-datacenter-azure-edition-core"
+  image_sku                 = local.deploy_gui == true ? "2022-datacenter-azure-edition-hotpatch" : "2022-datacenter-azure-edition-core"
   vm_size                   = "Standard_B2ms"
   communicator              = "winrm"
   winrm_insecure            = "true"
@@ -142,8 +149,6 @@ source "azure-arm" "build" {
   }
 }
 
-# a build block invokes sources and runs provisioning steps on them. The
-# documentation for build blocks can be found here:
 # https://www.packer.io/docs/templates/hcl_templates/blocks/build
 build {
   sources = ["source.azure-arm.build"]
@@ -172,21 +177,15 @@ build {
     source      = "${path.root}/toolsets/toolset.json"
   }
 
-
   provisioner "powershell" {
     inline = [
-      # Create a secure string for the password
       "$password = ConvertTo-SecureString '${var.install_password}' -AsPlainText -Force",
-      # Create the user with the secure password
       "New-LocalUser -Name '${var.install_user}' -Password $password -PasswordNeverExpires -UserMayNotChangePassword",
-      # Ensure the user creation command succeeded before attempting to add to group
       "if ($?) { Add-LocalGroupMember -Group 'Administrators' -Member '${var.install_user}' } else { Write-Error 'User creation failed.' }",
-      # Configure WinRM
       "winrm set winrm/config/service/auth '@{Basic=\"true\"}'",
       "winrm get winrm/config/service/auth"
     ]
   }
-
 
   provisioner "powershell" {
     inline = ["if (-not ((net localgroup Administrators) -contains '${var.install_user}')) { exit 1 }"]
@@ -262,7 +261,6 @@ build {
       "if (-not (Test-Path ${var.image_folder}\\Tests\\testResults.xml)) { throw '${var.image_folder}\\Tests\\testResults.xml not found' }"
     ]
   }
-
 
   provisioner "powershell" {
     environment_vars = ["INSTALL_USER=${var.install_user}"]

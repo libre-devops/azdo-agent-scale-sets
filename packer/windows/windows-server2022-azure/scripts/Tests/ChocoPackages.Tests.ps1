@@ -39,10 +39,10 @@ Describe "Packer" {
 }
 
 
-#Describe "Cygwin" {
-#    It "Cywgin" {
-#        "Get-Command cygwin" | Should -ReturnZeroExitCode
-#    }
-#}
+Describe "Cygwin" {
+    It "Cywgin" {
+        "choco list cygwin" | Should -ReturnZeroExitCode
+    }
+}
 
 
