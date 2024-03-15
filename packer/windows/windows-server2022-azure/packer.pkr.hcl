@@ -131,11 +131,11 @@ source "azure-arm" "build" {
 
   // Shared image gallery is created by terraform in the pre-req step, as is the resource group.
   shared_image_gallery_destination {
-    gallery_name   = local.gallery_name
-    image_name     = local.image_name
-    image_version  = local.image_version
-    resource_group = local.gallery_rg_name
-    subscription   = var.subscription_id
+    gallery_name        = local.gallery_name
+    image_name          = local.image_name
+    image_version       = local.image_version
+    resource_group      = local.gallery_rg_name
+    subscription        = var.subscription_id
     replication_regions = [
       "uksouth"
     ]
@@ -173,11 +173,16 @@ build {
   }
 
 
-  provisioner "windows-shell" {
+  provisioner "powershell" {
     inline = [
-      "net user ${var.install_user} ${var.install_password} /add /passwordchg:no /passwordreq:yes /active:yes /Y",
-      "net localgroup Administrators ${var.install_user} /add",
-      "winrm set winrm/config/service/auth @{Basic=\"true\"}",
+      # Create a secure string for the password
+      "$password = ConvertTo-SecureString '${var.install_password}' -AsPlainText -Force",
+      # Create the user with the secure password
+      "New-LocalUser -Name '${var.install_user}' -Password $password -PasswordNeverExpires -UserMayNotChangePassword -AccountActive $true",
+      # Add the user to the Administrators group
+      "Add-LocalGroupMember -Group 'Administrators' -Member '${var.install_user}'",
+      # Configure WinRM
+      "winrm set winrm/config/service/auth '@{Basic=\"true\"}'",
       "winrm get winrm/config/service/auth"
     ]
   }
