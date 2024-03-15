@@ -111,5 +111,5 @@ jobs:
           PKR_VAR_ARM_TENANT_ID: ${{ secrets.SpokeSvpTenantId }}
           ARM_CLIENT_ID: ${{ secrets.SpokeSvpApplicationId }}
           ARM_CLIENT_SECRET: ${{ secrets.SpokeSvpClientSecret }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.SpokeSubscriptionId }}it
+          ARM_SUBSCRIPTION_ID: ${{ secrets.SpokeSubscriptionId }}
           ARM_TENANT_ID: ${{ secrets.SpokeSvpTenantId }}
