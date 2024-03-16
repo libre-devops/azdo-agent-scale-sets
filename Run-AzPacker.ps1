@@ -134,8 +134,11 @@ function Update-KeyVaultNetworkRule
         # Reapply /32 subnet notation for consistent Azure Key Vault rules format
         $newIpRules = $newIpRules | ForEach-Object { "$_/32" }
 
+        # Ensure $newIpRules is passed as an array of strings
+        $newIpRulesArray = @($newIpRules) # This ensures that $newIpRules is treated as an array even if it contains only one element
+
         Update-AzKeyVaultNetworkRuleSet -VaultName $KeyVaultName -ResourceGroupName $ResourceGroupName `
-            -IpAddressRange $newIpRules -Bypass $currentNetworkAcls.Bypass -DefaultAction $currentNetworkAcls.DefaultAction
+            -IpAddressRange $newIpRulesArray -Bypass $currentNetworkAcls.Bypass -DefaultAction $currentNetworkAcls.DefaultAction
 
         Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Key Vault network configuration updated." -ForegroundColor Green
     }
@@ -144,6 +147,7 @@ function Update-KeyVaultNetworkRule
         Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: An error occurred: $_"
     }
 }
+
 
 # Function to check if Tfenv is installed
 function Check-PkenvExists
