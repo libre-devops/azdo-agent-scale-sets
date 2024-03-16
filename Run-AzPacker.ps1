@@ -108,12 +108,12 @@ function Update-KeyVaultNetworkRule
         $keyVault = Get-AzKeyVault -VaultName $keyvaultName -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId
         $currentNetworkAcls = $keyVault.NetworkAcls
 
-        Write-Host "[$( $MyInvocation.MyCommand.Name )] Fetching current IP rules for Key Vault: $KeyVaultName"
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Fetching current IP rules for Key Vault: $KeyVaultName"
         $currentIps = $currentNetworkAcls.IpAddressRanges | ForEach-Object { $_ -replace '/32$', '' }
-        Write-Host "[$( $MyInvocation.MyCommand.Name )] Current IP rules: $( $currentIps -join ', ' )"
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: Current IP rules: $( $currentIps -join ', ' )"
 
         $currentIp = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com").Trim()
-        Write-Host "[$( $MyInvocation.MyCommand.Name )] Current client IP: $currentIp"
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: Current client IP: $currentIp"
 
         $ipAlreadyExists = $currentIps -contains $currentIp
         # Ensure $newIpRules is always treated as an array
@@ -124,11 +124,11 @@ function Update-KeyVaultNetworkRule
             Write-Host "[$( $MyInvocation.MyCommand.Name )] Appending current client IP to existing IP rules." -ForegroundColor Green
             # Use the array addition operator to add a new element to the array
             $newIpRules += $currentIp
-            Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: New IP rules are $( $newIpRules -join ', ' )"
+            Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: New IP rules are $( $newIpRules -join ', ' )"
         }
         elseif (-not$AddClientIP -and $ipAlreadyExists)
         {
-            Write-Host "[$( $MyInvocation.MyCommand.Name )] Removing current client IP from existing IP rules." -ForegroundColor Green
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Removing current client IP from existing IP rules." -ForegroundColor Green
             $newIpRules = $newIpRules | Where-Object { $_ -ne $currentIp }
         }
         else
@@ -214,8 +214,6 @@ function Ensure-PackerVersion
     }
 }
 
-
-
 # Function to convert string to boolean
 function Convert-ToBoolean($value)
 {
@@ -263,7 +261,6 @@ function Connect-AzAccountWithServicePrincipal
         throw $_
     }
 }
-
 
 function Manage-CurrentIPInNsg
 {
