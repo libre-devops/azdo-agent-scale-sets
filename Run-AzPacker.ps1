@@ -137,7 +137,7 @@ function Update-KeyVaultNetworkRule
             return
         }
 
-        Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Updating IP rules: $( $newIpRules -join ', ' )"
+        Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: Updating IP rules: $( $newIpRules -join ', ' )"
         # Reapply /32 subnet notation for consistent Azure Key Vault rules format
         $newIpRules = $newIpRules | ForEach-Object { "$_/32" }
 
