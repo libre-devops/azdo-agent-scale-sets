@@ -492,7 +492,7 @@ try
     {
         Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag." -ForegroundColor Cyan
 
-        if ($null -ne $keyVaultName)
+        if ($null -ne $KeyvaultResourceId)
         {
             Update-KeyVaultNetworkRule -KeyVaultId $KeyvaultResourceId -AddClientIP $ConvertedAddCurrentClientToKeyvault
         }
@@ -588,7 +588,7 @@ finally
         Write-Host "Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag."
 
 
-        if ($null -ne $keyVaultName)
+        if ($null -ne $KeyvaultResourceId)
         {
             Update-KeyVaultNetworkRule -KeyVaultId $KeyvaultResourceId -AddClientIP $false
         }
