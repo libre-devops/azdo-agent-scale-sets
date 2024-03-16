@@ -94,30 +94,37 @@ function New-Password
 function Update-KeyVaultNetworkRule
 {
     param (
-        [string]$KeyVaultName,
-        [string]$ResourceGroupName,
+        [string]$KeyVaultId,
         [bool]$AddClientIP
     )
 
     try
     {
-        $keyVault = Get-AzKeyVault -VaultName $KeyVaultName -ResourceGroupName $ResourceGroupName
+        $resourceIdParts = $KeyVaultId -split '/'
+        $subscriptionId = $resourceIdParts[2]
+        $resourceGroupName = $resourceIdParts[4]
+        $keyvaultName = $resourceIdParts[-1]
+
+        $keyVault = Get-AzKeyVault -VaultName $keyvaultName -ResourceGroupName $resourceGroupName -SubscriptionId $subscriptionId
         $currentNetworkAcls = $keyVault.NetworkAcls
 
-        Write-Information "[$( $MyInvocation.MyCommand.Name )] Fetching current IP rules for Key Vault: $KeyVaultName"
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Fetching current IP rules for Key Vault: $KeyVaultName"
         $currentIps = $currentNetworkAcls.IpAddressRanges | ForEach-Object { $_ -replace '/32$', '' }
-        Write-Information "[$( $MyInvocation.MyCommand.Name )] Current IP rules: $( $currentIps -join ', ' )"
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Current IP rules: $( $currentIps -join ', ' )"
 
         $currentIp = (Invoke-RestMethod -Uri "https://checkip.amazonaws.com").Trim()
-        Write-Information "[$( $MyInvocation.MyCommand.Name )] Current client IP: $currentIp"
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Current client IP: $currentIp"
 
         $ipAlreadyExists = $currentIps -contains $currentIp
-        $newIpRules = $currentIps
+        # Ensure $newIpRules is always treated as an array
+        $newIpRules = @($currentIps)
 
         if ($AddClientIP -and -not$ipAlreadyExists)
         {
             Write-Host "[$( $MyInvocation.MyCommand.Name )] Appending current client IP to existing IP rules." -ForegroundColor Green
+            # Use the array addition operator to add a new element to the array
             $newIpRules += $currentIp
+            Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: New IP rules are $( $newIpRules -join ', ' )"
         }
         elseif (-not$AddClientIP -and $ipAlreadyExists)
         {
@@ -130,7 +137,7 @@ function Update-KeyVaultNetworkRule
             return
         }
 
-        Write-Information "[$( $MyInvocation.MyCommand.Name )] Info: Updating IP rules: $( $newIpRules -join ', ' )"
+        Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Updating IP rules: $( $newIpRules -join ', ' )"
         # Reapply /32 subnet notation for consistent Azure Key Vault rules format
         $newIpRules = $newIpRules | ForEach-Object { "$_/32" }
 
@@ -147,7 +154,6 @@ function Update-KeyVaultNetworkRule
         Write-Error "[$( $MyInvocation.MyCommand.Name )] Error: An error occurred: $_"
     }
 }
-
 
 # Function to check if Tfenv is installed
 function Check-PkenvExists
@@ -489,13 +495,9 @@ try
     {
         Write-Host "[$( $MyInvocation.MyCommand.Name )] Info: Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag." -ForegroundColor Cyan
 
-        $kvresourceIdParts = $KeyVaultResourceId -split '/'
-        $kvresourceGroupName = $kvresourceIdParts[4]
-        $keyVaultName = $kvresourceIdParts[-1]
-
         if ($null -ne $keyVaultName)
         {
-            Update-KeyVaultNetworkRule -KeyVaultName $keyVaultName -ResourceGroupName $kvresourceGroupName -AddClientIP $ConvertedAddCurrentClientToKeyvault
+            Update-KeyVaultNetworkRule -KeyVaultId $KeyvaultResourceId -AddClientIP $ConvertedAddCurrentClientToKeyvault
         }
         else
         {
@@ -588,13 +590,10 @@ finally
     {
         Write-Host "Starting script to update Key Vault firewall rules based on AddClientIPToFirewall flag."
 
-        $kvresourceIdParts = $KeyVaultResourceId -split '/'
-        $kvresourceGroupName = $kvresourceIdParts[4]
-        $keyVaultName = $kvresourceIdParts[-1]
 
         if ($null -ne $keyVaultName)
         {
-            Update-KeyVaultNetworkRule -KeyVaultName $keyVaultName -ResourceGroupName $kvresourceGroupName -AddClientIP $false
+            Update-KeyVaultNetworkRule -KeyVaultId $KeyvaultResourceId -AddClientIP $false
         }
         else
         {
