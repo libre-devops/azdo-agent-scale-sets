@@ -8,12 +8,23 @@ $chocoExePath = 'C:\ProgramData\Chocolatey\bin'
 $systemPath = [Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::Machine)
 $systemPath += ';' + $chocoExePath
 [Environment]::SetEnvironmentVariable("PATH", $systemPath, [System.EnvironmentVariableTarget]::Machine)
+# Path to MSYS2 executable directory
+$msys2Path = "C:\tools\msys64\usr\bin"
+if (-not $systemPath.Contains($msys2Path))
+{
+    $systemPath += ';' + $msys2Path
+    [Environment]::SetEnvironmentVariable("PATH", $systemPath, [System.EnvironmentVariableTarget]::Machine)
+}
+
 
 # Update local process' path
 $userPath = [Environment]::GetEnvironmentVariable('Path', [System.EnvironmentVariableTarget]::User)
-if ($userPath) {
+if ($userPath)
+{
     $env:Path = $systemPath + ";" + $userPath
-} else {
+}
+else
+{
     $env:Path = $systemPath
 }
 

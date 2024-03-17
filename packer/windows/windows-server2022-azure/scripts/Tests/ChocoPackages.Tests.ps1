@@ -38,11 +38,12 @@ Describe "Packer" {
     }
 }
 
-
-Describe "Cygwin" {
-    It "Cywgin" {
-        "choco list cygwin" | Should -ReturnZeroExitCode
+Describe "Msys2" {
+    It "Msys2" {
+        "choco list msys2" | Should -ReturnZeroExitCode
     }
 }
+
+
 
 

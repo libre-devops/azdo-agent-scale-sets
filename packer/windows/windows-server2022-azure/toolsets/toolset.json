@@ -53,7 +53,7 @@
                 "name": "gh"
             },
             {
-                "name": "cygwin"
+                "name": "msys2"
             },
             {
                 "name": "sysinternals"
