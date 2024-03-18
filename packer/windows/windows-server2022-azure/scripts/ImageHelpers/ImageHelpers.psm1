@@ -44,4 +44,5 @@ Export-ModuleMember -Function @(
     'Get-WindowsUpdatesHistory'
     'New-ItemPath'
     'Get-ModuleVersionAsJob'
+    'Convert-ToBoolean'
 )

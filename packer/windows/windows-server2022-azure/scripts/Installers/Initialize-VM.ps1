@@ -3,7 +3,7 @@
 ##  Desc:  VM initialization script, machine level configuration
 ################################################################################
 
-$BuildWithGui = ConvertTo-Boolean $Env:BUILD_WITH_GUI
+$BuildWithGui = Convert-ToBoolean $Env:BUILD_WITH_GUI
 
 function Disable-InternetExplorerESC
 {
