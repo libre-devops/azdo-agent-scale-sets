@@ -1,4 +1,4 @@
-name: 'Terraform Destroy - Scale Set'
+name: 'Windows Server 2022 - Terraform Destroy - Scale Set'
 
 # Allow run manually
 on:

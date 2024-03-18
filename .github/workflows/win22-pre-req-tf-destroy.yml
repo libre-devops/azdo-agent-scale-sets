@@ -1,4 +1,4 @@
-name: 'Terraform Destroy - Pre-Req'
+name: 'Windows Server 2022 - Terraform Destroy - Pre-Req'
 
 # Allow run manually
 on:

@@ -1,4 +1,4 @@
-name: 'Terraform Apply - Pre-Req'
+name: 'Windows Server 2022 - Terraform Apply - Pre-Req'
 
 # Allow run manually
 on:

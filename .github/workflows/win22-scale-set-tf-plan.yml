@@ -1,4 +1,4 @@
-name: 'Terraform Plan - Scale Set'
+name: 'Windows Server 2022 - Terraform Plan - Scale Set'
 
 # Allow run manually
 on:

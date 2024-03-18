@@ -1,4 +1,4 @@
-name: 'Packer Build - Windows Server 2022'
+name: 'Windows Server 2022 - Packer Build'
 
 # Allow run manually
 on:

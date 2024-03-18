@@ -1,4 +1,4 @@
-name: 'Terraform Apply - Scale Set'
+name: 'Windows Server 2022 - Terraform Apply - Scale Set'
 
 # Allow run manually
 on:
