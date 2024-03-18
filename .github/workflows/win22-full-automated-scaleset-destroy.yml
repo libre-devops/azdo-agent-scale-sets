@@ -25,10 +25,6 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Install tenv
         id: install-tenv
         shell: pwsh
@@ -41,24 +37,6 @@ jobs:
           Invoke-WebRequest -Uri $tenvDownloadUrl -OutFile $tenvFilePath
 
           sudo dpkg -i $tenvFilePath
-
-      - name: Install trivy
-        id: install-trivy
-        shell: pwsh
-        run: |
-          brew install trivy
-
-      - name: Install checkov
-        id: install-checkov
-        shell: pwsh
-        run: |
-          pip3 install checkov
-
-      - name: Install terraform-compliance
-        id: install-terraform-compliance
-        shell: pwsh
-        run: |
-          pip3 install terraform-compliance
 
       - name: Install PowerShell modules
         id: install-powershell-modules
@@ -134,29 +112,6 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install pkenv
-        id: install-pkenv
-        shell: pwsh
-        run: |
-          brew tap kwilczynski/homebrew-pkenv
-          brew install pkenv
-          $PackerJsonUrl = "https://api.releases.hashicorp.com/v1/releases/packer"
-          $JsonContent = Invoke-RestMethod -Uri $PackerJsonUrl 
-
-          # Filter out pre-releases and sort by version number
-          $LatestVersion = $JsonContent | Where-Object { $_.is_prerelease -eq $false } | Sort-Object { [Version] $_.version } -Descending | Select-Object -First 1
-
-          # Output the latest version number
-          $PackerLatestVersion = $LatestVersion.version
-
-          # Use pkenv to install and use the latest Packer version
-          pkenv install $PackerLatestVersion
-          pkenv use $PackerLatestVersion
-
       - name: Install PowerShell modules
         id: install-powershell-modules
         shell: pwsh
@@ -199,10 +154,6 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Install tenv
         id: install-tenv
         shell: pwsh
@@ -215,24 +166,6 @@ jobs:
           Invoke-WebRequest -Uri $tenvDownloadUrl -OutFile $tenvFilePath
 
           sudo dpkg -i $tenvFilePath
-
-      - name: Install trivy
-        id: install-trivy
-        shell: pwsh
-        run: |
-          brew install trivy
-
-      - name: Install checkov
-        id: install-checkov
-        shell: pwsh
-        run: |
-          pip3 install checkov
-
-      - name: Install terraform-compliance
-        id: install-terraform-compliance
-        shell: pwsh
-        run: |
-          pip3 install terraform-compliance
 
       - name: Install PowerShell modules
         id: install-powershell-modules
