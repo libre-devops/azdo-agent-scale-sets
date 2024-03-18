@@ -66,7 +66,7 @@ try
             {
                 Write-Host "Deleting image version: $( $imageVersion.Name )"
                 # Uncomment the next line to actually perform the deletion
-                # Remove-AzGalleryImageVersion -ResourceGroupName $gallery.ResourceGroupName -GalleryName $gallery.Name -GalleryImageDefinitionName $imageDef.Name -GalleryImageVersionName $imageVersion.Name -Force
+                Remove-AzGalleryImageVersion -ResourceGroupName $gallery.ResourceGroupName -GalleryName $gallery.Name -GalleryImageDefinitionName $imageDef.Name -GalleryImageVersionName $imageVersion.Name -Force
             }
         }
     }
