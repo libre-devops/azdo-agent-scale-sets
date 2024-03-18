@@ -268,7 +268,7 @@ jobs:
 
           .\Run-AzTerraform.ps1 `
             -TerraformCodeLocation "terraform/0-pre-req" `
-            -RunTerraformInit false `
+            -RunTerraformInit true `
             -RunTerraformPlan false `
             -RunTerraformPlanDestroy true `
             -RunTerraformApply false `
