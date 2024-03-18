@@ -104,14 +104,12 @@ variable "tenant_id" {
 // Begins Packer build Section
 source "azure-arm" "build" {
 
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
-
+  client_id                 = var.client_id
+  client_secret             = var.client_secret
+  subscription_id           = var.subscription_id
+  tenant_id                 = var.tenant_id
   build_resource_group_name = local.gallery_rg_name
   build_key_vault_name      = local.key_vault_name
-  // The sku you want to base your image off - In this case - Ubuntu 22
   os_type                   = "Windows"
   image_publisher           = "MicrosoftWindowsServer"
   image_offer               = "WindowsServer"
@@ -149,7 +147,6 @@ source "azure-arm" "build" {
   }
 }
 
-# https://www.packer.io/docs/templates/hcl_templates/blocks/build
 build {
   sources = ["source.azure-arm.build"]
 
@@ -191,11 +188,20 @@ build {
     inline = ["if (-not ((net localgroup Administrators) -contains '${var.install_user}')) { exit 1 }"]
   }
 
-  #Enable Test Mode (disable for more security)
   provisioner "powershell" {
-    elevated_password = "${var.install_password}"
-    elevated_user     = "${var.install_user}"
-    inline            = ["bcdedit.exe /set TESTSIGNING ON"]
+    elevated_user     = var.install_user
+    elevated_password = var.install_password
+
+    environment_vars = [
+      "RUN_TASK=true"
+    ]
+    inline = [
+      "if ($env:RUN_TASK -eq 'true') {",
+      "  bcdedit.exe /set TESTSIGNING ON",
+      "} else {",
+      "  Write-Output 'DEPLOY_GUI is not true, skipping...'",
+      "}"
+    ]
   }
 
   provisioner "powershell" {
@@ -203,7 +209,8 @@ build {
       "IMAGE_VERSION=${local.image_version}",
       "IMAGE_OS=${local.image_os}",
       "AGENT_TOOLSDIRECTORY=${var.agent_tools_directory}",
-      "IMAGEDATA_FILE=${var.imagedata_file}"
+      "IMAGEDATA_FILE=${var.imagedata_file}",
+      "BUILD_WITH_GUI=${local.deploy_gui}"
     ]
     execution_policy = "unrestricted"
     scripts          = [
