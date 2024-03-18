@@ -37,6 +37,19 @@ locals {
   name = "vmss${var.short}${var.loc}${var.env}01"
 }
 
+module "azdo_spn" {
+  source = "github.com/libre-devops/terraform-azuredevops-federated-managed-identity-connection"
+
+  rg_id    = data.azurerm_resource_group.rg.id
+  location = data.azurerm_resource_group.rg.location
+  tags     = data.azurerm_resource_group.rg.tags
+
+  azuredevops_organization_guid = data.azurerm_key_vault_secret.azdo_guid.value
+  azuredevops_organization_name = data.azurerm_key_vault_secret.azdo_org_name.value
+  azuredevops_project_name      = data.azurerm_key_vault_secret.azdo_project_name.value
+}
+
+
 module "windows_vm_scale_set" {
   source = "libre-devops/windows-uniform-orchestration-vm-scale-sets/azurerm"
 
@@ -63,14 +76,14 @@ module "windows_vm_scale_set" {
       enable_automatic_updates        = true
       create_asg                      = true
 
-      identity_type = "SystemAssigned, UserAssigned"
-      identity_ids  = [data.azurerm_user_assigned_identity.uid.id]
+      identity_type     = "SystemAssigned, UserAssigned"
+      identity_ids      = [module.azdo_spn.user_assigned_managed_identity_id]
       network_interface = [
         {
           name                          = "nic-${local.name}"
           primary                       = true
           enable_accelerated_networking = false
-          ip_configuration = [
+          ip_configuration              = [
             {
               name                           = "ipconfig-${local.name}"
               primary                        = true

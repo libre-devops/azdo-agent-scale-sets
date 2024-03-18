@@ -23,3 +23,18 @@ data "azurerm_key_vault_secret" "admin_pwd" {
   key_vault_id = data.azurerm_key_vault.mgmt_kv.id
   name         = title("${var.short}AdminPwd")
 }
+
+data "azurerm_key_vault_secret" "azdo_guid" {
+  key_vault_id = data.azurerm_key_vault.mgmt_kv.id
+  name         = "AzdoOrgId"
+}
+
+data "azurerm_key_vault_secret" "azdo_org_name" {
+  key_vault_id = data.azurerm_key_vault.mgmt_kv.id
+  name         = "AzdoOrgName"
+}
+
+data "azurerm_key_vault_secret" "azdo_project_name" {
+  key_vault_id = data.azurerm_key_vault.mgmt_kv.id
+  name         = "AzdoProjectName"
+}
