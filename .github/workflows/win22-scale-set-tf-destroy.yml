@@ -1,4 +1,4 @@
-name: 'Terraform Apply'
+name: 'Terraform Destroy - Scale Set'
 
 # Allow run manually
 on:
@@ -7,7 +7,7 @@ on:
       terraform_code_location:
         type: string
         description: What working directory should be passed to the script
-        default: "terraform/0-pre-req"
+        default: "terraform/1-scale-set"
       run_trivy:
         type: boolean
         description: 'Whether trivy should be ran'
@@ -127,10 +127,10 @@ jobs:
           .\Run-AzTerraform.ps1 `
             -TerraformCodeLocation ${{ inputs.terraform_code_location }} `
             -RunTerraformInit true `
-            -RunTerraformPlan true `
-            -RunTerraformPlanDestroy false `
-            -RunTerraformApply true `
-            -RunTerraformDestroy false `
+            -RunTerraformPlan false `
+            -RunTerraformPlanDestroy true `
+            -RunTerraformApply false `
+            -RunTerraformDestroy true `
             -DebugMode $DebugMode `
             -RunTrivy ${{ inputs.run_trivy }} `
             -RunCheckov ${{ inputs.run_checkov }} `

@@ -1,4 +1,4 @@
-name: 'Terraform Destroy'
+name: 'Terraform Destroy - Pre-Req'
 
 # Allow run manually
 on:
