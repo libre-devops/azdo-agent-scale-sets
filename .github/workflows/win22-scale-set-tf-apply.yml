@@ -39,7 +39,7 @@ on:
       terraform_state_name:
         type: string
         description: 'Name of the Terraform state file'
-        default: 'lbd-uks-prd-azdo-pre-req.terraform.tfstate'
+        default: 'lbd-uks-prd-azdo-scale-sets.terraform.tfstate'
 
 jobs:
   run-script:
