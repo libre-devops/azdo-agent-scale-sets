@@ -72,20 +72,20 @@ module "windows_vm_scale_set" {
       use_custom_image                = true
       custom_source_image_id          = data.azurerm_shared_image.azdo_win_image.id
       disable_password_authentication = true
-      overprovision                   = true
-      upgrade_mode                    = "Automatic"
-      single_placement_group          = true
+      overprovision                   = false    # Azure DevOps will set overprovision to false
+      upgrade_mode                    = "Manual" # Azure DevOps will set to Manual anyway
+      single_placement_group          = false    # Must be disabled for Azure DevOps or will fail
       enable_automatic_updates        = true
       create_asg                      = true
 
-      identity_type     = "SystemAssigned, UserAssigned"
-      identity_ids      = [module.azdo_spn.user_assigned_managed_identity_id]
+      identity_type = "SystemAssigned, UserAssigned"
+      identity_ids  = [module.azdo_spn.user_assigned_managed_identity_id]
       network_interface = [
         {
           name                          = "nic-${local.name}"
           primary                       = true
           enable_accelerated_networking = false
-          ip_configuration              = [
+          ip_configuration = [
             {
               name                           = "ipconfig-${local.name}"
               primary                        = true
@@ -111,15 +111,23 @@ module "windows_vm_scale_set" {
 }
 
 # This does not install the extension, trying to install the extension manually fails as it needs parameters.
-#data "azuredevops_project" "project" {
-#  name = data.azurerm_key_vault_secret.azdo_project_name.value
-#}
-#
-#resource "azuredevops_elastic_pool" "azure_pool" {
-#  name                   = module.windows_vm_scale_set.ss_name[local.name]
-#  service_endpoint_id    = module.azdo_spn.service_endpoint_id
-#  service_endpoint_scope = data.azuredevops_project.project.id
-#  desired_idle           = 1
-#  max_capacity           = 2
-#  azure_resource_id      = module.windows_vm_scale_set.ss_id[local.name]
-#}
+data "azuredevops_project" "project" {
+  name = data.azurerm_key_vault_secret.azdo_project_name.value
+}
+
+resource "azuredevops_elastic_pool" "azure_pool" {
+  name                   = module.windows_vm_scale_set.ss_name[local.name]
+  service_endpoint_id    = module.azdo_spn.service_endpoint_id
+  service_endpoint_scope = data.azuredevops_project.project.id
+  desired_idle           = 1
+  max_capacity           = 2
+  azure_resource_id      = module.windows_vm_scale_set.ss_id[local.name]
+  recycle_after_each_use = false
+  time_to_live_minutes   = 30
+  agent_interactive_ui   = false
+  auto_provision         = true
+  auto_update            = true
+  project_id             = data.azuredevops_project.project.id
+}
+
+
