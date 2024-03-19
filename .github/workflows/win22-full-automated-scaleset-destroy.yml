@@ -95,6 +95,7 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.SpokeSubscriptionId }}
           ARM_TENANT_ID: ${{ secrets.SpokeSvpTenantId }}
           ARM_USE_AZUREAD: true
+          AZDO_ORG_SERVICE_URL: ${{ secrets.AzdoOrgServiceUrl }}
 
   run-delete-images:
     name: 'Delete Images'
