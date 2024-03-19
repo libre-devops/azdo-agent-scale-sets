@@ -292,7 +292,7 @@ jobs:
             -BackendStorageAccountRgName ${{ secrets.SpokeMgmtRgName }} `
             -BackendStorageAccountName ${{ secrets.SpokeSaName }} `
             -BackendStorageAccountBlobContainerName ${{ secrets.SpokeSaBlobContainerName }} `
-            -BackendStorageAccountBlobStatefileName "lbd-uks-prd-azdo-scale-set.terraform.tfstate"
+            -BackendStorageAccountBlobStatefileName "lbd-uks-prd-azdo-scale-sets.terraform.tfstate"
         env:
           ARM_CLIENT_ID: ${{ secrets.SpokeSvpApplicationId }}
           ARM_CLIENT_SECRET: ${{ secrets.SpokeSvpClientSecret }}
